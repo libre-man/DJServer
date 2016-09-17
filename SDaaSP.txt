@@ -1,0 +1,66 @@
+# Creating new client
+Client sends request to the server:
+```
+{
+    "func":                 "new_client",       :: String
+    "time":                 unix_time_stamp,    :: Int
+    "data": {
+        "age":              unix_time_stamp,    :: Int
+        "gender":           "m",                :: String
+        *
+    }
+}
+```
+
+Server responds to client:
+```
+{
+    "success":              true,               :: Boolean
+    "client_id":            1                   :: Int
+}
+```
+
+# Joining a session
+Client sends request to server:
+```
+{
+    "func":                 "join_session",     :: String
+    "time":                 unix_time_stamp,    :: Int
+    "data": {
+        "client_id":        1,                  :: Int
+        "session_id":       1,                  :: Int
+    }
+}
+```
+
+Server responds:
+```
+{
+    "success":              true,               :: Boolean
+    "channels": [
+        {
+            "channel_id":   channel_id,         :: Int
+            "color":        color,              :: Int
+            "url":          url,                :: String
+        }*
+    ]
+    "session_name":         "CoolDisco"         :: String
+}
+```
+
+# Data logging
+Client sends data to server every $INTERVAL:
+```
+{
+    "func":                 "log_data",         :: String
+    "time":                 unix_time_stamp,    :: Int
+    "data": {
+        "client_id":        1,                  :: Int
+        "session_id":       1,                  :: Int
+        "channel_id":       1,                  :: Int
+        "location":         ?,                  :: ?
+        "accelerometer":    ?,                  :: ?
+        *
+    }
+}
+```
