@@ -1,8 +1,7 @@
 # Creating new client
-Client sends request to the server:
+Client sends request to the server (new_client):
 ```
 {
-    "func":                 "new_client",       :: String
     "time":                 unix_time_stamp,    :: Int
     "data": {
         "age":              unix_time_stamp,    :: Int
@@ -21,10 +20,9 @@ Server responds to client:
 ```
 
 # Joining a session
-Client sends request to server:
+Client sends request to server (join_session):
 ```
 {
-    "func":                 "join_session",     :: String
     "time":                 unix_time_stamp,    :: Int
     "data": {
         "client_id":        1,                  :: Int
@@ -49,10 +47,9 @@ Server responds:
 ```
 
 # Data logging
-Client sends data to server every $INTERVAL:
+Client sends data to server every $INTERVAL (log_data):
 ```
 {
-    "func":                 "log_data",         :: String
     "time":                 unix_time_stamp,    :: Int
     "data": {
         "client_id":        1,                  :: Int
