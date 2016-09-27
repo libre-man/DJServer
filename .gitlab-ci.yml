@@ -18,5 +18,3 @@ style_app:
   type: test
   script:
     - make style
-  only:
-    - master
