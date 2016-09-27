@@ -1,1 +1,4 @@
-nose
+coverage
+pytest
+pytest-cov
+pep8
