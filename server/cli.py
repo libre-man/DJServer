@@ -1,5 +1,5 @@
 from server import app
 
 
-def main():
-    app.run(debug=True)
+def main(debug=True):
+    app.run(debug=debug)
