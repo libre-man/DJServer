@@ -9,6 +9,7 @@ sys.path.insert(0, my_path + '/../')
 from server import app
 import server.cli as cli
 
+
 @pytest.mark.parametrize("debug", [True, False])
 def test_main(capsys, debug, monkeypatch):
     mock_run = MockingFunction()

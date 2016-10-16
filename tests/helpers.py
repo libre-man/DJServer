@@ -1,6 +1,7 @@
 import os
 import pytest
 
+
 class MockingFunction():
     def __init__(self, func=None):
         self.called = False

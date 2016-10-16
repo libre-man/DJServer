@@ -9,9 +9,11 @@ sys.path.insert(0, my_path + '/../')
 from server import app as _app
 import server.views as views
 
+
 @pytest.fixture
 def app():
     yield _app.test_client()
+
 
 def test_index(app):
     index = app.get('/')
