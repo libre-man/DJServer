@@ -10,6 +10,3 @@ import server.cli as cli
 
 def test_main(capsys):
     assert(True)
-    #cli.main()
-    #out, _ = capsys.readouterr()
-    #assert out == '5\n'
