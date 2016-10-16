@@ -1,2 +1,4 @@
+from server import app
+
 def main():
-    print(5)
+    app.run(debug=True)

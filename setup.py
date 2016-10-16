@@ -10,9 +10,14 @@ config = {
     'download_url': 'https://gitlab.com/SilentDiscoAsAService/Server',
     'author_email': 'thomas@libremail.nl',
     'version': '0.0',
-    'install_requires': ['nose'],
+    'install_requires': ['nose', 'Flask'],
     'packages': ['server'],
     'scripts': [],
+    'entry_points': {
+        'console_scripts': [
+            'server = server.cli:main'
+        ]
+    },
     'name': 'server'
 }
 
