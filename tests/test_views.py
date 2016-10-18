@@ -16,6 +16,24 @@ def app():
 
 
 def test_index(app):
-    index = app.get('/')
-    assert index.status_code == 200
-    assert views.index() == index.data.decode("utf-8")
+    page = app.get('/')
+    assert page.status_code == 200
+    assert views.index() == page.data.decode("utf-8")
+
+
+def test_new_client(app):
+    page = app.get('/new_client')
+    assert page.status_code == 200
+    assert views.new_client() == page.data.decode('utf-8')
+
+
+def test_join_session(app):
+    page = app.get('/join_session')
+    assert page.status_code == 200
+    assert views.join_session() == page.data.decode('utf-8')
+
+
+def test_log_data(app):
+    page = app.get('/log_data')
+    assert page.status_code == 200
+    assert views.log_data() == page.data.decode('utf-8')
