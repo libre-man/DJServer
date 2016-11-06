@@ -6,6 +6,8 @@ from datetime import datetime
 
 def parse_client_json(required_keys=None):
     json = request.get_json()
+
+    print(json)
     if 'data' in json and 'time' in json:
         data = json['data']
         time = json['time']
