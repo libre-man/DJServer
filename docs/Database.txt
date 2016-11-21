@@ -28,6 +28,7 @@ Data:
     -> client_id
     -> session_id
     -> channel_id
-    -> date
+    -> client_timestamp
+    -> server_timestamp
     -> accelerometer
     ... (additional logging data)
