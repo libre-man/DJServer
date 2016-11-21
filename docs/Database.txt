@@ -1,0 +1,34 @@
+A simple database model for the SDaaS server.
+
+Session:
+    -> id
+    -> host_id
+    -> name
+    -> start_date
+    -> end_date
+
+Channel:
+    -> id
+    -> session_id
+
+Host:
+    -> id
+    -> username
+    -> password
+    -> name
+
+Client:
+    -> id
+    -> name
+    -> birth_date
+    ... (additional client data)
+
+Data:
+    -> id
+    -> client_id
+    -> session_id
+    -> channel_id
+    -> client_timestamp
+    -> server_timestamp
+    -> accelerometer
+    ... (additional logging data)
