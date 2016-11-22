@@ -10,11 +10,17 @@ class Session(models.Model):
     created = models.DateField(auto_now_add=True)
     last_modified = models.DateField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Channel(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     url = models.URLField()
     color = models.IntegerField()
+
+    def __str__(self):
+        return '%d: %s' % (self.id, self.url)
 
 
 class Client(models.Model):
@@ -22,6 +28,9 @@ class Client(models.Model):
     birth_date = models.DateField()
     created = models.DateField(auto_now_add=True)
     last_modified = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class JoinedClient(models.Model):
