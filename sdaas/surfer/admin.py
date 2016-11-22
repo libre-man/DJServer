@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Session, Channel
+
+admin.site.register(Session)
+admin.site.register(Channel)
