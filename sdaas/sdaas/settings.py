@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['10.1.10.179']
 # Application definition
 
 INSTALLED_APPS = [
+    'surfer.apps.SurferConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

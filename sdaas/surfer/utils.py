@@ -13,9 +13,6 @@ def parse_client_json(request, required_keys=None):
                 for key, required_type in required_keys:
                     if key not in data or not isinstance(data[key],
                                                          required_type):
-                        break
-                else:
-                    return data, datetime.fromtimestamp(time)
-            else:
-                return data, datetime.fromtimestamp(time)
+                        return None, None
+            return data, datetime.fromtimestamp(time)
     return None, None
