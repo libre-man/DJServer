@@ -9,6 +9,7 @@ from django.utils import timezone
 from . import utils
 from .models import Client, Session, JoinedClient, Channel
 
+
 def index(request):
     return HttpResponse('Hello, World!')
 
@@ -20,8 +21,8 @@ def new_client(request):
 
     if request.method == 'POST':
         data, time = utils.parse_client_json(request.body, {('name', str)})
-   
-        if data is not None and time is not None: 
+
+        if data is not None and time is not None:
             client = Client(name=data['name'], birth_date=timezone.now())
             client.save()
 
@@ -29,7 +30,7 @@ def new_client(request):
             response_data['client_id'] = client.id
 
     return HttpResponse(json.dumps(response_data),
-            content_type='application/json')
+                        content_type='application/json')
 
 
 @csrf_exempt
@@ -39,7 +40,8 @@ def join_session(request):
 
     if request.method == 'POST':
         data, time = utils.parse_client_json(request.body,
-                {('client_id', int), ('session_id', int)})
+                                             {('client_id', int),
+                                              ('session_id', int)})
 
         if data is not None and time is not None:
             try:
@@ -55,20 +57,18 @@ def join_session(request):
 
                     response_data['channels'] = []
                     for c in channels:
-                        response_data['channels'].append(
-                                { 'channel_id': c.id,
-                                  'color': c.color,
-                                  'url': c.url
-                                })
+                        response_data['channels'].append({'channel_id': c.id,
+                                                          'color': c.color,
+                                                          'url': c.url})
 
                 else:
-                    response_data['error'] = 'Client has already joined the session'
+                    response_data['error'] = 'Client has already joined'
 
             except ObjectDoesNotExist:
                 response_data['error'] = 'Client or session does not exist'
 
     return HttpResponse(json.dumps(response_data),
-            content_type='application/json')
+                        content_type='application/json')
 
 
 @csrf_exempt
@@ -83,4 +83,4 @@ def log_data(request):
             response_data['success'] = True
 
     return HttpResponse(json.dumps(response_data),
-            content_type='application/json')
+                        content_type='application/json')
