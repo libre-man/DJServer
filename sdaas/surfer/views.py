@@ -30,6 +30,7 @@ def new_client(request):
     return HttpResponse(json.dumps(response_data),
             content_type='application/json')
 
+
 @csrf_exempt
 def join_session(request):
     response_data = {}
