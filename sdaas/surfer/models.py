@@ -13,6 +13,8 @@ class Session(models.Model):
 
 class Channel(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    url = models.URLField()
+    color = models.IntegerField()
 
 
 class Client(models.Model):

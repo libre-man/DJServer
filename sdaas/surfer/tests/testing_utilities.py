@@ -16,15 +16,18 @@ def populate_test_db():
     s.save()
 
     # Create channels.
-    c1 = Channel(session=s)
+    c1 = Channel(session=s, url="http://sdaas.nl/test1", color=0xFFFFFF)
     c1.save()
-    c2 = Channel(session=s)
+    c2 = Channel(session=s, url="http://sdaas.nl/test2", color=0xFFFFFF)
     c2.save()
 
     # Create client.
-    client = Client(name='client', birth_date=timezone.now())
-    client.save()
+    client1 = Client(name='client', birth_date=timezone.now())
+    client1.save()
 
-    joined = JoinedClient(client=client, session=s)
+    client2 = Client(name='unjoinedclient', birth_date=timezone.now())
+    client2.save()
+
+    joined = JoinedClient(client=client1, session=s)
     joined.save()
 

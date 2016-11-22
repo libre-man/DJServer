@@ -1,12 +1,13 @@
 import json
 
+from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 
 from . import utils
-from .models import Client, Session, JoinedClient
+from .models import Client, Session, JoinedClient, Channel
 
 def index(request):
     return HttpResponse('Hello, World!')
@@ -50,7 +51,16 @@ def join_session(request):
                     joined_client.save()
 
                     response_data['success'] = True
-                    # TODO: add channels to response_data
+                    channels = Channel.objects.filter(session=s)
+
+                    response_data['channels'] = []
+                    for c in channels:
+                        response_data['channels'].append(
+                                { 'channel_id': c.id,
+                                  'color': c.color,
+                                  'url': c.url
+                                })
+
                 else:
                     response_data['error'] = 'Client has already joined the session'
 
