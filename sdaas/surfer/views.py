@@ -20,7 +20,7 @@ def new_client(request):
     response_data['success'] = False
 
     if request.method == 'POST':
-        data, time = utils.parse_client_json(request.body, {('name', str)})
+        data, time = utils.parse_client_json(request.body, {('name', str), ('birth_date', int)})
 
         if data is not None and time is not None:
             client = Client(name=data['name'], birth_date=timezone.now())

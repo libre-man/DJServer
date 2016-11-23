@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Session(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    join_code = models.CharField(max_length=16)
     start = models.DateField()
     end = models.DateField()
     created = models.DateField(auto_now_add=True)
