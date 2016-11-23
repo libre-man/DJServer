@@ -15,7 +15,7 @@ class RequestTests(TestCase):
     def test_new_client(self):
         data = {'time': int(time.time()), 'data': {
                 'name': 'testname',
-                'birth_data': int(time.time())
+                'birth_date': int(time.time())
             }}
 
         response = self.client.post('/new_client/', json.dumps(data),
