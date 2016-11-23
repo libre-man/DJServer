@@ -46,6 +46,7 @@ class RequestTests(TestCase):
 
         content = json.loads(response.content.decode('utf-8'))
         self.assertTrue(content['success'])
+        self.assertEquals(content['session_name'], 'test_session')
         self.assertEquals(len(content['channels']), 2)
 
     def test_log_data_valid(self):

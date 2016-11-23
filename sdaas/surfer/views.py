@@ -52,18 +52,15 @@ def join_session(request):
                     joined_client = JoinedClient(client=c, session=s)
                     joined_client.save()
 
-                    response_data['success'] = True
-                    channels = Channel.objects.filter(session=s)
+                response_data['success'] = True
+                response_data['session_name'] = s.name
+                channels = Channel.objects.filter(session=s)
 
-                    response_data['channels'] = []
-                    for c in channels:
-                        response_data['channels'].append({'channel_id': c.id,
-                                                          'color': c.color,
-                                                          'url': c.url})
-
-                else:
-                    response_data['error'] = 'Client has already joined'
-
+                response_data['channels'] = []
+                for c in channels:
+                    response_data['channels'].append({'channel_id': c.id,
+                                                      'color': c.color,
+                                                      'url': c.url})
             except ObjectDoesNotExist:
                 response_data['error'] = 'Client or session does not exist'
 
