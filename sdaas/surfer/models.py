@@ -6,8 +6,8 @@ class Session(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     join_code = models.CharField(max_length=16)
-    start = models.DateField()
-    end = models.DateField()
+    start = models.DateTimeField()
+    end = models.DateTimeField()
     created = models.DateField(auto_now_add=True)
     last_modified = models.DateField(auto_now=True)
 
