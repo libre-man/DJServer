@@ -12,9 +12,9 @@ test_app:
   type: test
   script:
     - make test
-    - make coverage
+      #    - make coverage
 
-style_app:
-  type: test
-  script:
-    - make style
+#style_app:
+#  type: test
+#  script:
+#- make style
