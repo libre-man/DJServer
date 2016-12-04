@@ -25,7 +25,7 @@ SECRET_KEY = 'ivssqj3u99d(k!3bnc(zc6yh!ty67qis7pxn*z7a@b#143=(0%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.1.10.179', 'localhost', 'testserver']
+ALLOWED_HOSTS = ['sdaas.yovo.nl', 'www.sdaas.yovo.nl', 'sdaas.nl', 'www.sdaas.nl', 'testserver']
 
 
 # Application definition
@@ -116,6 +116,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
+# https://docs.djangoproject.com/en/1.10/howto/static-files
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/home/yourivoet/public/sdaas.nl/Server/sdaas/static/'

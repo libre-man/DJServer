@@ -10,3 +10,6 @@ dist/
 .cache
 htmlcov
 build/*
+sdaas/static
+sdaasenv/
+db.sqlite3

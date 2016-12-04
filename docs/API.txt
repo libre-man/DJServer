@@ -42,7 +42,8 @@ Server responds:
             "url":          url,                :: String
         }*
     ]
-    "session_name":         "CoolDisco"         :: String
+    "session_name":         "CoolDisco",        :: String
+    "ntp_server":           "http://..."        :: String
 }
 ```
 
