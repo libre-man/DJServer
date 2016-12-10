@@ -8,8 +8,8 @@ class Session(models.Model):
     join_code = models.CharField(max_length=16)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    created = models.DateField(auto_now_add=True)
-    last_modified = models.DateField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -27,8 +27,8 @@ class Channel(models.Model):
 class Client(models.Model):
     name = models.CharField(max_length=100)
     birth_date = models.DateField()
-    created = models.DateField(auto_now_add=True)
-    last_modified = models.DateField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -42,5 +42,5 @@ class JoinedClient(models.Model):
 class Data(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
-    client_time = models.DateField()
-    server_time = models.DateField(auto_now_add=True)
+    client_time = models.DateTimeField()
+    server_time = models.DateTimeField(auto_now_add=True)
