@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import time
 
 def parse_client_json(request, required_keys=None):
     try:
@@ -19,3 +20,6 @@ def parse_client_json(request, required_keys=None):
     except json.JSONDecodeError:
         pass
     return None, None
+
+def datetime_to_epoch(value):
+    return int(time.mktime(value.timetuple()) * 1000)
