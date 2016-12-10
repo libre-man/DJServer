@@ -8,8 +8,6 @@ class Session(models.Model):
     join_code = models.CharField(max_length=16)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    created = models.DateTimeField(auto_now_add=True)
-    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -27,8 +25,6 @@ class Channel(models.Model):
 class Client(models.Model):
     name = models.CharField(max_length=100)
     birth_date = models.DateField()
-    created = models.DateTimeField(auto_now_add=True)
-    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
