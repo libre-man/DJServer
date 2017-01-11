@@ -1,32 +1,51 @@
+{% load bootstrap3 %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{% block title %}sdaas{% endblock %}</title>
+
+    {% bootstrap_css %}
 </head>
 
 <body>
-    <header>
-        <h1>sdaas</h1>
+    <header class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>sdaas</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-tabs">
+                    <li role="presentation"><a href="/">Home</a></li>
+                    {% block menubar %}
+
+                    {% endblock %}
+                </ul>
+            </div>
+        </div>
     </header>
 
-    <div id="sidebar">
-        {% block sidebar %}
-        <ul>
-            <li><a href="/">Home</a></li>
-        </ul>
-        {% endblock %}
-    </div>
-
-    <section>
+    <section class="container-fluid">
         {% block content %}{% endblock %}
-    <section>
+    </section>
 
-    <footer>
-        {% block footer %}
-        
-        <p>Copyright &copy; 2017 sdaas.nl<p>
+    <footer class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                {% block footer %}
 
-        {% endblock %}
+                <p>Copyright &copy; 2017 sdaas.nl<p>
+
+                {% endblock %}
+            </div>
+        </div>
     </footer>
+
+    {% bootstrap_javascript %}
 </body>
 </html>

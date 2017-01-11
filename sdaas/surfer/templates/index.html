@@ -1,20 +1,29 @@
 {% extends "base.html" %}
-
+{% load bootstrap3 %}
+{% load surfer_extras %}
 {% block content %}
 
-<h2>Your sessions</h2>
+<div class="row">
+    <div class="col-md-12">
+        <h3>Your sessions</h3>
+    </div>
+</div>
 
-<table>
-    <tr><th>Name</th><th>Actions</th></tr>
-    {% for s in sessions %}
-        <tr>
-            <td><a href="/session/{{ s.id }}/">{{ s.name }}</a></td>
-            <td>
-                <a href="/session/{{ s.id }}/edit/">Edit</a>
-                <a href="/session/{{ s.id }}/delete/">Delete</a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <tr><th>Name</th><th>Actions</th></tr>
+            {% for s in sessions %}
+                <tr>
+                    <td><a href="/session/{{ s.id }}/">{{ s.name }}</a></td>
+                    <td>
+                        {% bootstrap_button "View" href="/session/"|addstr:s.id|addstr:"/" %}
+                        {% bootstrap_button "Edit" href="/session/"|addstr:s.id|addstr:"/edit/" button_class="btn-warning" %}
+                        {% bootstrap_button "Delete" href="/session/"|addstr:s.id|addstr:"/delete/" button_class="btn-danger"%}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
 {% endblock %}
