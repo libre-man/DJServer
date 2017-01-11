@@ -1,3 +1,4 @@
 coverage
 pep8
 django
+django-bootstrap3

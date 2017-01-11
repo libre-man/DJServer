@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if channel %}
+
+    URL: {{ channel.url }}<br />
+    Color: {{ channel.color }}<br />
+
+{% else %}
+    <p>Channel not found</p>
+{% endif %}
+
+{% endblock %}

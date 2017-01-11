@@ -5,14 +5,74 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.shortcuts import render
 
 from . import utils
 from .models import Client, Session, JoinedClient, Channel
+from .forms import SessionForm
 
 
+@login_required
 def index(request):
-    return HttpResponse('Hello, World!')
+    sessions = Session.objects.filter(host=request.user)
 
+    return render(request, 'index.html', {'sessions': sessions})
+
+
+@login_required
+@permission_required('surfer.add_session')
+def add_session(request):
+    if request.method == 'POST':
+        form = SessionForm(request.POST)
+
+        if form.is_valid():
+            pass
+
+    else:
+        form = SessionForm()
+
+    return render(request, 'add_session.html', {'form': form})
+
+
+@login_required
+def session_detail(request, session_id):
+    session = Session.objects.get(id=session_id, host=request.user)
+
+    if session is not None:
+        channels = Channel.objects.filter(session=session)
+
+    return render(request, 'session_detail.html', {'session': session, 'channels': channels})
+
+@login_required
+@permission_required('surfer.change_session')
+def session_edit(request, session_id):
+    return HttpResponse()
+
+@login_required
+@permission_required('surfer.delete_session')
+def session_delete(request, session_id):
+    return HttpResponse()
+
+
+@login_required
+@permission_required('surfer.add_channel')
+def add_channel(request, session_id):
+    return HttpResponse()
+
+
+@login_required
+@permission_required('surfer.delete_channel')
+def channel_delete(request, channel_id):
+    return HttpResponse()
+
+
+@login_required
+def channel_detail(request, channel_id):
+    channel = Channel.objects.get(id=channel_id)
+
+    return render(request, 'channel_detail.html', {'channel': channel})
 
 @csrf_exempt
 def new_client(request):

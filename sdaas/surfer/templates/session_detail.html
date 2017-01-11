@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if session %}
+    Name: {{ session.name }}<br />
+    Start: {{ session.start }}<br />
+    End: {{ session.end }}<br />
+
+    <br />
+
+    Channels: <br /><br />
+    {% for c in channels %}
+        URL: <a href="/channel/{{ c.id }}/">{{ c.url }}</a>
+        <a href="/channel/{{ c.id }}/delete/">delete</a><br />
+    {% endfor %}
+    <br />
+    <a href="/session/{{ session.id }}/channel/add/">Add new channel</a>
+
+{% else %}
+    <p>Session not found</p>
+{% endif %}
+
+{% endblock %}
