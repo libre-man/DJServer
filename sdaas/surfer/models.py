@@ -21,6 +21,9 @@ class Channel(models.Model):
     def __str__(self):
         return '%d: %s' % (self.id, self.url)
 
+    def color_str(self):
+        return '#%0.6X' % self.color
+
 
 class Client(models.Model):
     name = models.CharField(max_length=100)

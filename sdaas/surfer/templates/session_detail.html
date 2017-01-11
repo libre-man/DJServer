@@ -1,21 +1,54 @@
 {% extends "base.html" %}
 
+{% load bootstrap3 %}
+{% load surfer_extras %}
+
 {% block content %}
 
 {% if session %}
-    Name: {{ session.name }}<br />
-    Start: {{ session.start }}<br />
-    End: {{ session.end }}<br />
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ session.name }}</h3>
+        </div>
+    </div>
 
-    <br />
+    <div class="row">
+        <div class="col-md-6">
+            <dl>
+                <dt>Start</dt>
+                <dd>{{ session.start }}</dd>
+                <dt>End</dt>
+                <dd>{{ session.end }}</dd>
+            </dl>
+        </div>
 
-    Channels: <br /><br />
-    {% for c in channels %}
-        URL: <a href="/channel/{{ c.id }}/">{{ c.url }}</a>
-        <a href="/channel/{{ c.id }}/delete/">delete</a><br />
-    {% endfor %}
-    <br />
-    <a href="/session/{{ session.id }}/channel/add/">Add new channel</a>
+        <div class="col-md-6">
+            <h4>Channels</h4>
+
+            <table class="table">
+                <tr>
+                    <th>URL</th>
+                    <th>Color</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for c in channels %}
+                    <tr>
+                        <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
+                        <td><div style="width:70px;height:20px;background-color:{{ c.color_str }}"></div></td>
+                        <td>
+                            {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
+                            {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
+                            {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger"%}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% bootstrap_button "Add new channel" href="/channel/add/" %}
+
+        </div>
+    </div>
 
 {% else %}
     <p>Session not found</p>
