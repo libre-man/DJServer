@@ -2,7 +2,7 @@ import json
 
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -10,8 +10,8 @@ from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render
 
 from . import utils
-from .models import Client, Session, JoinedClient, Channel
-from .forms import SessionForm
+from .models import Client, Session, JoinedClient, Channel, File
+from .forms import SessionForm, UploadFileForm
 
 
 @login_required
@@ -45,10 +45,12 @@ def session_detail(request, session_id):
 
     return render(request, 'session_detail.html', {'session': session, 'channels': channels})
 
+
 @login_required
 @permission_required('surfer.change_session')
 def session_edit(request, session_id):
     return HttpResponse()
+
 
 @login_required
 @permission_required('surfer.delete_session')
@@ -72,7 +74,36 @@ def channel_delete(request, channel_id):
 def channel_detail(request, channel_id):
     channel = Channel.objects.get(id=channel_id)
 
-    return render(request, 'channel_detail.html', {'channel': channel})
+    if channel is not None:
+        files = File.objects.filter(channel=channel)
+        form = UploadFileForm()
+
+    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form})
+
+
+@login_required
+def channel_upload(request, channel_id):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+
+        print("Getting form")
+
+        if form.is_valid():
+            print("valid form")
+            instance = File(upload=request.FILES[
+                            'upload'], channel=Channel.objects.get(id=channel_id))
+            instance.save()
+
+    return HttpResponseRedirect('/channel/{}/'.format(channel_id))
+
+
+@login_required
+def file_delete(request, file_id):
+    f = File.objects.get(pk=file_id)
+    f.delete()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @csrf_exempt
 def new_client(request):
@@ -80,7 +111,8 @@ def new_client(request):
     response_data['success'] = False
 
     if request.method == 'POST':
-        data, time = utils.parse_client_json(request.body, {('name', str), ('birth_date', int)})
+        data, time = utils.parse_client_json(
+            request.body, {('name', str), ('birth_date', int)})
 
         if data is not None and time is not None:
             client = Client(name=data['name'], birth_date=timezone.now())
@@ -122,7 +154,8 @@ def join_session(request):
                                                       'color': c.color,
                                                       'url': c.url})
 
-                response_data['session_start'] = utils.datetime_to_epoch(s.start)
+                response_data[
+                    'session_start'] = utils.datetime_to_epoch(s.start)
             except ObjectDoesNotExist:
                 response_data['error'] = 'Client or session does not exist'
 

@@ -3,12 +3,20 @@ from django import forms
 
 from .models import Session, Channel
 
+
 class SessionForm(ModelForm):
+
     class Meta:
         model = Session
         fields = ['name', 'start', 'end']
 
+
 class ChannelForm(ModelForm):
+
     class Meta:
         model = Channel
         fields = ['url', 'color']
+
+
+class UploadFileForm(forms.Form):
+    upload = forms.FileField()

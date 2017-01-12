@@ -1,5 +1,9 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import pre_delete
+from django.dispatch.dispatcher import receiver
 
 
 class Session(models.Model):
@@ -23,6 +27,25 @@ class Channel(models.Model):
 
     def color_str(self):
         return '#%0.6X' % self.color
+
+
+def file_path(instance, filename):
+    return 'channels/{}/{}'.format(instance.channel.id, filename)
+
+
+class File(models.Model):
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    upload = models.FileField(upload_to=file_path)
+
+    def filename(self):
+        return os.path.basename(self.upload.name)
+
+
+@receiver(pre_delete, sender=File)
+def file_delete(sender, instance, **kwargs):
+    if instance.upload:
+        if os.path.isfile(instance.upload.path):
+            os.remove(instance.upload.path)
 
 
 class Client(models.Model):
