@@ -14,5 +14,4 @@ sdaas/static
 sdaasenv/
 db.sqlite3
 uploads/
-migrations/
 __pycache__/
