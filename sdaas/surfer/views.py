@@ -28,7 +28,10 @@ def add_session(request):
         form = SessionForm(request.POST)
 
         if form.is_valid():
-            pass
+            new_session = form.save(commit=False)
+            new_session.host = request.user
+            new_session.save()
+            return HttpResponseRedirect('/session/{}/'.format(new_session.id))
 
     else:
         form = SessionForm()
@@ -49,13 +52,30 @@ def session_detail(request, session_id):
 @login_required
 @permission_required('surfer.change_session')
 def session_edit(request, session_id):
-    return HttpResponse()
+    instance = Session.objects.get(pk=session_id)
+
+    if request.method == 'POST':
+        form = SessionForm(request.POST, instance=instance)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/session/{}/'.format(session_id))
+
+    else:
+        form = SessionForm(instance=instance)
+
+    return render(request, 'edit_session.html', {'form': form, 'session_id': session_id})
 
 
 @login_required
 @permission_required('surfer.delete_session')
 def session_delete(request, session_id):
-    return HttpResponse()
+    instance = Session.objects.get(pk=session_id)
+
+    if instance is not None:
+        instance.delete()
+
+    return HttpResponseRedirect('/')
 
 
 @login_required
@@ -86,10 +106,7 @@ def channel_upload(request, channel_id):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
 
-        print("Getting form")
-
         if form.is_valid():
-            print("valid form")
             instance = File(upload=request.FILES[
                             'upload'], channel=Channel.objects.get(id=channel_id))
             instance.save()
