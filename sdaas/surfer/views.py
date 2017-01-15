@@ -119,7 +119,15 @@ def channel_edit(request, channel_id):
 @login_required
 @permission_required('surfer.delete_channel')
 def channel_delete(request, channel_id):
-    return HttpResponse()
+    instance = Channel.objects.get(pk=channel_id)
+
+    if instance is not None:
+        session_id = instance.session.id
+        instance.delete()
+
+        return HttpResponseRedirect('/session/{}/'.format(session_id))
+
+    return HttpResponseRedirect('/')
 
 
 @login_required
