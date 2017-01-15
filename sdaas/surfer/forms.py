@@ -24,7 +24,7 @@ class ChannelForm(ModelForm):
 
     class Meta:
         model = Channel
-        fields = ['url', 'color']
+        fields = ['name', 'color']
 
 
 class UploadFileForm(forms.Form):

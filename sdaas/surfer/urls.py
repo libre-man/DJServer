@@ -19,6 +19,8 @@ urlpatterns = [
         views.add_channel, name='add_channel'),
     url(r'^channel/(?P<channel_id>[0-9]+)/$',
         views.channel_detail, name='channel_detail'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/edit/$',
+        views.channel_edit, name='channel_edit'),
     url(r'^channel/(?P<channel_id>[0-9]+)/delete/$',
         views.channel_delete, name='channel_delete'),
     url(r'^channel/(?P<channel_id>[0-9]+)/upload/$',

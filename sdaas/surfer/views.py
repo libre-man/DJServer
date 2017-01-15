@@ -11,7 +11,7 @@ from django.shortcuts import render
 
 from . import utils
 from .models import Client, Session, JoinedClient, Channel, File
-from .forms import SessionForm, UploadFileForm
+from .forms import SessionForm, UploadFileForm, ChannelForm
 
 
 @login_required
@@ -81,7 +81,39 @@ def session_delete(request, session_id):
 @login_required
 @permission_required('surfer.add_channel')
 def add_channel(request, session_id):
-    return HttpResponse()
+    session = Session.objects.get(pk=session_id)
+
+    if request.method == 'POST':
+        form = ChannelForm(request.POST)
+
+        if form.is_valid():
+            new_channel = form.save(commit=False)
+            new_channel.session = session
+            new_channel.save()
+            return HttpResponseRedirect('/session/{}/'.format(session_id))
+
+    else:
+        form = ChannelForm()
+
+    return render(request, 'add_channel.html', {'form': form, 'session': session})
+
+
+@login_required
+@permission_required('surfer.change_channel')
+def channel_edit(request, channel_id):
+    instance = Channel.objects.get(pk=channel_id)
+
+    if request.method == 'POST':
+        form = ChannelForm(request.POST, instance=instance)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/channel/{}/'.format(instance.id))
+
+    else:
+        form = ChannelForm(instance=instance)
+
+    return render(request, 'edit_channel.html', {'form': form, 'channel_id': channel_id})
 
 
 @login_required

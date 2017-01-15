@@ -18,8 +18,9 @@ class Session(models.Model):
 
 
 class Channel(models.Model):
+    name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    url = models.URLField()
+    url = models.URLField(null=True)
     color = models.IntegerField()
 
     def __str__(self):

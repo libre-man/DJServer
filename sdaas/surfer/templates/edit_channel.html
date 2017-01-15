@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Edit channel</h3>
+        <form action="/channel/{{ channel_id }}/edit/" method="post">
+            {% csrf_token %}
+            {% include "bootstrap_form.html" %}
+        </form>
+    </div>
+</div>
+
+{% endblock %}
