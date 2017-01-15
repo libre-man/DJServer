@@ -52,13 +52,30 @@ def session_detail(request, session_id):
 @login_required
 @permission_required('surfer.change_session')
 def session_edit(request, session_id):
-    return HttpResponse()
+    instance = Session.objects.get(pk=session_id)
+
+    if request.method == 'POST':
+        form = SessionForm(request.POST, instance=instance)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/session/{}/'.format(session_id))
+
+    else:
+        form = SessionForm(instance=instance)
+
+    return render(request, 'edit_session.html', {'form': form, 'session_id': session_id})
 
 
 @login_required
 @permission_required('surfer.delete_session')
 def session_delete(request, session_id):
-    return HttpResponse()
+    instance = Session.objects.get(pk=session_id)
+
+    if instance is not None:
+        instance.delete()
+
+    return HttpResponseRedirect('/')
 
 
 @login_required

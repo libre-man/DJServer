@@ -8,7 +8,8 @@
 {% if session %}
     <div class="row">
         <div class="col-md-12">
-            <h3>{{ session.name }}</h3>
+            <h3>{{ session.name }}
+                <a href="/session/{{ session.id }}/edit/">{% bootstrap_icon "pencil" %}</a></h3>
         </div>
     </div>
 
