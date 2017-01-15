@@ -28,7 +28,10 @@ def add_session(request):
         form = SessionForm(request.POST)
 
         if form.is_valid():
-            pass
+            new_session = form.save(commit=False)
+            new_session.host = request.user
+            new_session.save()
+            return HttpResponseRedirect('/session/{}/'.format(new_session.id))
 
     else:
         form = SessionForm()
@@ -86,10 +89,7 @@ def channel_upload(request, channel_id):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
 
-        print("Getting form")
-
         if form.is_valid():
-            print("valid form")
             instance = File(upload=request.FILES[
                             'upload'], channel=Channel.objects.get(id=channel_id))
             instance.save()
