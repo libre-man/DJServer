@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+{% load surfer_extras %}
+
+{% block content %}
+
+{% if session %}
+    <div class="row">
+        <div class="col-md-12">
+            <h3>{{ session.name }}</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <dl>
+                <dt>Start</dt>
+                <dd>{{ session.start }}</dd>
+                <dt>End</dt>
+                <dd>{{ session.end }}</dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Channels</h4>
+
+            <table class="table">
+                <tr>
+                    <th>URL</th>
+                    <th>Color</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for c in channels %}
+                    <tr>
+                        <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
+                        <td><div class="color-bar" style="background-color:{{ c.color_str }}"></div></td>
+                        <td>
+                            {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
+                            {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
+                            {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger"%}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% bootstrap_button "Add new channel" href="/channel/add/" %}
+
+        </div>
+    </div>
+
+{% else %}
+    <p>Session not found</p>
+{% endif %}
+
+{% endblock %}

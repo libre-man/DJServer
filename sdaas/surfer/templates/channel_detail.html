@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+{% load surfer_extras %}
+
+{% block content %}
+
+{% if channel %}
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Channel details</h3>
+            <dl>
+                <dt>URL</dt>
+                <dd>{{ channel.url }}</dd>
+                <dt>Color</dt>
+                <dd><div class="color-bar" style="background-color:{{ channel.color_str }}"></div></dd>
+            </dl>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Music</h3>
+            <table class="table">
+                <tr>
+                    <th>File</th>
+                    <th>Actions</th>
+                </tr>
+
+
+                {% for f in files %}
+                    <tr>
+                        <td>{{ f.filename }}</td>
+                        <td>
+                            {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+            <form action="/channel/{{ channel.id }}/upload/" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="submit" />
+            </form>
+        </div>
+    </div>
+{% else %}
+    <p>Channel not found</p>
+{% endif %}
+
+{% endblock %}
