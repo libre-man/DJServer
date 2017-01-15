@@ -20,6 +20,8 @@
                 <dd>{{ session.start }}</dd>
                 <dt>End</dt>
                 <dd>{{ session.end }}</dd>
+                <dt>Join code</dt>
+                <dd>{{ session.join_code }}</dd>
             </dl>
         </div>
 
@@ -28,6 +30,7 @@
 
             <table class="table">
                 <tr>
+                    <th>Name</th>
                     <th>URL</th>
                     <th>Color</th>
                     <th>Actions</th>
@@ -35,6 +38,7 @@
 
                 {% for c in channels %}
                     <tr>
+                        <td>{{ c.name }}</td>
                         <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
                         <td><div class="color-bar" style="background-color:{{ c.color_str }}"></div></td>
                         <td>
@@ -46,7 +50,7 @@
                 {% endfor %}
             </table>
 
-            {% bootstrap_button "Add new channel" href="/channel/add/" %}
+            {% bootstrap_button "Add new channel" href="/session/"|addstr:session.id|addstr:"/channel/add/" %}
 
         </div>
     </div>
