@@ -13,21 +13,13 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'ivssqj3u99d(k!3bnc(zc6yh!ty67qis7pxn*z7a@b#143=(0%'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['sdaas.yovo.nl', 'www.sdaas.yovo.nl', 'sdaas.nl',
-                 'www.sdaas.nl', 'testserver', '127.0.0.1', 'localhost']
-
+DEBUG = False
 
 # Application definition
 
@@ -73,17 +65,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sdaas.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
@@ -121,7 +102,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files
 
 STATIC_URL = '/static/'
-#STATIC_ROOT = '/home/yourivoet/public/sdaas.nl/Server/sdaas/static/'
 
 LOGIN_URL = '/accounts/login/'
 
