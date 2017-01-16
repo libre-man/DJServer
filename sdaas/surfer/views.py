@@ -50,6 +50,11 @@ def add_session(request):
             new_session = form.save(commit=False)
             new_session.host = request.user
             new_session.save()
+
+            # Create default channel
+            new_channel = Channel(name="Default", session=new_session, color=0)
+            new_channel.save()
+
             return HttpResponseRedirect('/session/{}/'.format(new_session.id))
 
     else:
