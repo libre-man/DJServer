@@ -8,4 +8,7 @@ class ColorPicker(TextInput):
         return int(data.get(name)[1:], 16)
 
     def render(self, name, value, attrs=None):
+        if value is None:
+            value = 0
+
         return super(ColorPicker, self).render(name, '#%0.6X' % value, attrs)
