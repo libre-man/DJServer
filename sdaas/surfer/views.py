@@ -274,6 +274,20 @@ def iteration(request):
 
 @csrf_exempt
 def music_processed(request):
+    """Callback for when a music file is processed by a channel controller.
+
+    Expected JSON: { 'id': int }
+    """
+    if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
+        if isinstance(data["id"], int):
+            instance = File.objects.get(data["id"])
+
+            if instance is not None:
+                instance.is_processed = True
+                instance.save()
+
     return HttpResponse()
 
 
