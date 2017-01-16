@@ -269,6 +269,16 @@ def im_alive(request):
 
     Expected JSON: { 'id': int }
     """
+    if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
+        if isinstance(data["id"], int):
+            instance = Channel.objects.get(pk=data["id"])
+
+            if instance is not None:
+                instance.is_initialized = True
+                instance.save()
+
     return HttpResponse()
 
 
@@ -291,7 +301,7 @@ def music_processed(request):
         data = utils.parse_json(request.body)
 
         if isinstance(data["id"], int):
-            instance = File.objects.get(data["id"])
+            instance = File.objects.get(pk=data["id"])
 
             if instance is not None:
                 instance.is_processed = True
