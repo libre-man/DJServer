@@ -166,9 +166,8 @@ def channel_upload(request, channel_id):
         form = UploadFileForm(request.POST, request.FILES)
 
         if form.is_valid():
-            instance = File(upload=request.FILES[
-                            'upload'], channel=Channel.objects.get(id=channel_id))
-            instance.save()
+            File.objects.create_file(upload=request.FILES['upload'],
+                                     channel=Channel.objects.get(id=channel_id))
 
     return HttpResponseRedirect('/channel/{}/'.format(channel_id))
 

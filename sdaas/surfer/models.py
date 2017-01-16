@@ -22,7 +22,7 @@ class ChannelManager(models.Manager):
     def create_channel(self, session, name="Default", color=0):
         channel = self.create(name=name, session=session, color=color)
 
-        # Create docker container.
+        # TODO: Create docker container.
 
         return channel
 
@@ -45,7 +45,7 @@ class Channel(models.Model):
 
 @receiver(pre_delete, sender=Channel)
 def channel_delete(sender, instance, **kwargs):
-    # Kill docker container.
+    # TODO: Kill docker container.
     pass
 
 
@@ -53,9 +53,22 @@ def file_path(instance, filename):
     return 'channels/{}/{}'.format(instance.channel.id, filename)
 
 
+class FileManager(models.Manager):
+
+    def create_file(self, channel, upload):
+        instance = self.create(channel=channel, upload=upload)
+
+        # TODO: Send request to channel docker container: /add_music
+
+        return instance
+
+
 class File(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     upload = models.FileField(upload_to=file_path)
+    is_processed = models.BooleanField(default=False)
+
+    objects = FileManager()
 
     def filename(self):
         return os.path.basename(self.upload.name)
@@ -63,6 +76,8 @@ class File(models.Model):
 
 @receiver(pre_delete, sender=File)
 def file_delete(sender, instance, **kwargs):
+    # TODO: send request to docker container: /delete_music
+
     if instance.upload:
         if os.path.isfile(instance.upload.path):
             os.remove(instance.upload.path)
