@@ -22,6 +22,7 @@ class Channel(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     url = models.URLField(null=True)
     color = models.IntegerField()
+    is_initialized = models.BooleanField(default=False)
 
     def __str__(self):
         return '%d: %s' % (self.id, self.url)
