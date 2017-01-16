@@ -37,6 +37,7 @@ echo "Done"
 echo "Applying database migrations"
 cd sdaas
 ./manage.py migrate --settings=sdaas.settings.production
+./manage.py collectstatic --settings=sdaas.settings.production
 echo "Done"
 
 deactivate
