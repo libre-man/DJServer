@@ -42,9 +42,13 @@
                         <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
                         <td><div class="color-bar" style="background-color:{{ c.color_str }}"></div></td>
                         <td>
-                            {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
-                            {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
-                            {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger"%}
+                            {% if c.is_initialized %}
+                                {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
+                                {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
+                                {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger" %}
+                            {% else %}
+                                Initializing channel...
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
