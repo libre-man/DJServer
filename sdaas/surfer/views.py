@@ -264,11 +264,20 @@ def log_data(request):
 
 @csrf_exempt
 def im_alive(request):
+    """Callback for when a channel controller is fully initialized and the web
+    server is running.
+
+    Expected JSON: { 'id': int }
+    """
     return HttpResponse()
 
 
 @csrf_exempt
 def iteration(request):
+    """Callback for a channel controller iteration.
+
+    Expected JSON: { 'id': int, 'file_mixed': string }
+    """
     return HttpResponse()
 
 
@@ -293,4 +302,8 @@ def music_processed(request):
 
 @csrf_exempt
 def controller_started(request):
+    """Callback for when a channel controller has started succesfully.
+
+    Expected JSON: { 'id': int, 'epoch': int }
+    """
     return HttpResponse()
