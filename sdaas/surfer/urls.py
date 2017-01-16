@@ -13,6 +13,8 @@ urlpatterns = [
         views.session_edit, name='session_edit'),
     url(r'^session/(?P<session_id>[0-9]+)/delete/$',
         views.session_delete, name='session_delete'),
+    url(r'^session/(?P<session_id>[0-9]+)/settings/$',
+        views.session_settings, name='session_settings'),
 
     # Channel:
     url(r'^session/(?P<session_id>[0-9]+)/channel/add/$',

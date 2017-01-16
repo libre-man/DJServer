@@ -22,6 +22,24 @@ def index(request):
     return render(request, 'index.html', {'sessions': sessions})
 
 
+# Session views
+# -----------------------------------------------------------------------------
+
+@login_required
+def session_detail(request, session_id):
+    session = Session.objects.get(id=session_id, host=request.user)
+
+    if session is not None:
+        channels = Channel.objects.filter(session=session)
+
+    return render(request, 'session_detail.html', {'session': session, 'channels': channels})
+
+
+@login_required
+def session_settings(request, session_id):
+    return HttpResponse()
+
+
 @login_required
 @permission_required('surfer.add_session')
 def add_session(request):
@@ -38,16 +56,6 @@ def add_session(request):
         form = SessionForm()
 
     return render(request, 'add_session.html', {'form': form})
-
-
-@login_required
-def session_detail(request, session_id):
-    session = Session.objects.get(id=session_id, host=request.user)
-
-    if session is not None:
-        channels = Channel.objects.filter(session=session)
-
-    return render(request, 'session_detail.html', {'session': session, 'channels': channels})
 
 
 @login_required
@@ -77,6 +85,20 @@ def session_delete(request, session_id):
         instance.delete()
 
     return HttpResponseRedirect('/')
+
+
+# Channel views
+# -----------------------------------------------------------------------------
+
+@login_required
+def channel_detail(request, channel_id):
+    channel = Channel.objects.get(id=channel_id)
+
+    if channel is not None:
+        files = File.objects.filter(channel=channel)
+        form = UploadFileForm()
+
+    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form})
 
 
 @login_required
@@ -131,16 +153,8 @@ def channel_delete(request, channel_id):
     return HttpResponseRedirect('/')
 
 
-@login_required
-def channel_detail(request, channel_id):
-    channel = Channel.objects.get(id=channel_id)
-
-    if channel is not None:
-        files = File.objects.filter(channel=channel)
-        form = UploadFileForm()
-
-    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form})
-
+# Music file upload
+# -----------------------------------------------------------------------------
 
 @login_required
 def channel_upload(request, channel_id):
@@ -162,6 +176,9 @@ def file_delete(request, file_id):
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
+# Client->Server protocol methods
+# -----------------------------------------------------------------------------
 
 @csrf_exempt
 def new_client(request):
@@ -240,7 +257,7 @@ def log_data(request):
 
 
 # Controller->Server protocol methods
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 @csrf_exempt
 def im_alive(request):

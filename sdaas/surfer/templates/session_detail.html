@@ -23,6 +23,8 @@
                 <dt>Join code</dt>
                 <dd>{{ session.join_code }}</dd>
             </dl>
+
+            {% bootstrap_button "Advanced settings" href="/session/"|addstr:session.id|addstr:"/settings/" %}
         </div>
 
         <div class="col-md-6">
