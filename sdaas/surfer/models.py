@@ -17,6 +17,16 @@ class Session(models.Model):
         return self.name
 
 
+class ChannelManager(models.Manager):
+
+    def create_channel(self, session, name="Default", color=0):
+        channel = self.create(name=name, session=session, color=color)
+
+        # Create docker container.
+
+        return channel
+
+
 class Channel(models.Model):
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
@@ -24,11 +34,19 @@ class Channel(models.Model):
     color = models.IntegerField()
     is_initialized = models.BooleanField(default=False)
 
+    objects = ChannelManager()
+
     def __str__(self):
         return '%d: %s' % (self.id, self.url)
 
     def color_str(self):
         return '#%0.6X' % self.color
+
+
+@receiver(pre_delete, sender=Channel)
+def channel_delete(sender, instance, **kwargs):
+    # Kill docker container.
+    pass
 
 
 def file_path(instance, filename):

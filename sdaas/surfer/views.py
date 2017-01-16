@@ -52,8 +52,7 @@ def add_session(request):
             new_session.save()
 
             # Create default channel
-            new_channel = Channel(name="Default", session=new_session, color=0)
-            new_channel.save()
+            new_channel = Channel.objects.create_channel(session=new_session)
 
             return HttpResponseRedirect('/session/{}/'.format(new_session.id))
 
@@ -116,8 +115,8 @@ def add_channel(request, session_id):
 
         if form.is_valid():
             new_channel = form.save(commit=False)
-            new_channel.session = session
-            new_channel.save()
+            Channel.objects.create_channel(
+                name=new_channel.name, color=new_channel.color, session=session)
             return HttpResponseRedirect('/session/{}/'.format(session_id))
 
     else:
