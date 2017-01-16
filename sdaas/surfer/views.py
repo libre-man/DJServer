@@ -271,3 +271,13 @@ def im_alive(request):
 @csrf_exempt
 def iteration(request):
     return HttpResponse()
+
+
+@csrf_exempt
+def music_processed(request):
+    return HttpResponse()
+
+
+@csrf_exempt
+def controller_started(request):
+    return HttpResponse()

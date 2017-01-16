@@ -40,4 +40,6 @@ urlpatterns = [
     # Controller->Server API urls:
     url(r'^im_alive/', views.im_alive, name='im_alive'),
     url(r'^iteration/', views.iteration, name='iteration'),
+    url(r'^music_processed/', views.music_processed, name='music_processed'),
+    url(r'^controller_started/', views.controller_started, name='controller_started'),
 ]
