@@ -50,11 +50,11 @@ def file_delete(sender, instance, **kwargs):
 
 
 class Client(models.Model):
-    name = models.CharField(max_length=100)
     birth_date = models.DateField()
+    gender = models.CharField(max_length=1)
 
     def __str__(self):
-        return self.name
+        return "{} {} {}".format(self.id, self.birth_date, self.gender)
 
 
 class JoinedClient(models.Model):
