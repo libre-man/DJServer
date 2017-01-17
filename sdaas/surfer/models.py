@@ -101,3 +101,27 @@ class Data(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     client_time = models.DateTimeField()
     server_time = models.DateTimeField(auto_now_add=True)
+
+
+class ControllerPart(models.Model):
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+
+    COMMUNICATOR, CONTROLLER, PICKER, TRANSITIONER = range(4)
+    CATEGORY_CHOICES = {
+        (COMMUNICATOR, 'Communicator'),
+        (CONTROLLER, 'Controller'),
+        (PICKER, 'Picker'),
+        (TRANSITIONER, 'Transitioner'),
+    }
+
+    category = models.IntegerField(choices=CATEGORY_CHOICES)
+    name = models.CharField(max_length=50)
+
+
+class ControllerPartOptions(models.Model):
+    controller_part = models.ForeignKey(
+        ControllerPart, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    documentation = models.TextField()
+    required = models.BooleanField(default=False)
+    fixed = models.BooleanField(default=False)
