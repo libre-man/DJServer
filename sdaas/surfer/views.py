@@ -185,6 +185,7 @@ def file_delete(request, file_id):
 
 @csrf_exempt
 def new_client(request):
+    """Lets a new Android application create a client on the server."""
     response_data = {}
     response_data['success'] = False
 
@@ -208,6 +209,11 @@ def new_client(request):
 
 @csrf_exempt
 def join_session(request):
+    """Lets a client Android application join a session.
+
+    Returns a JSON response containing all the channels in the session and
+    the session name.
+    """
     response_data = {}
     response_data['success'] = False
 
@@ -246,6 +252,11 @@ def join_session(request):
 
 @csrf_exempt
 def log_data(request):
+    """Saves data into the database.
+
+    This method is called by joined Android clients every n (configurable by
+    the application) seconds.
+    """
     response_data = {}
     response_data['success'] = False
 
