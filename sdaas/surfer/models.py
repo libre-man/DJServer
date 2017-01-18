@@ -74,6 +74,7 @@ class File(models.Model):
         return os.path.basename(self.upload.name)
 
 
+
 @receiver(pre_delete, sender=File)
 def file_delete(sender, instance, **kwargs):
     # TODO: send request to docker container: /delete_music
@@ -81,6 +82,11 @@ def file_delete(sender, instance, **kwargs):
     if instance.upload:
         if os.path.isfile(instance.upload.path):
             os.remove(instance.upload.path)
+
+class PlayedFile(models.Model):
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    time_played = models.DateTimeField(auto_now_add=True)
 
 
 class Client(models.Model):
