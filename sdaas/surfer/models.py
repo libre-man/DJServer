@@ -7,6 +7,11 @@ from django.dispatch.dispatcher import receiver
 
 
 class Session(models.Model):
+    """A session is the model that contains a single silent disco.
+
+    Each session consists of one or more channels which play music.
+    """
+
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     join_code = models.CharField(max_length=16)
@@ -28,6 +33,9 @@ class ChannelManager(models.Manager):
 
 
 class Channel(models.Model):
+    """A channel is an entity which spawns and controls a single controller,
+    which plays music automatically.
+    """
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     url = models.URLField(null=True)
@@ -64,6 +72,9 @@ class FileManager(models.Manager):
 
 
 class File(models.Model):
+    """Represents an uploaded music file, used by a channel's controller to
+    play music.
+    """
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     upload = models.FileField(upload_to=file_path)
     is_processed = models.BooleanField(default=False)
@@ -74,7 +85,6 @@ class File(models.Model):
         return os.path.basename(self.upload.name)
 
 
-
 @receiver(pre_delete, sender=File)
 def file_delete(sender, instance, **kwargs):
     # TODO: send request to docker container: /delete_music
@@ -83,13 +93,18 @@ def file_delete(sender, instance, **kwargs):
         if os.path.isfile(instance.upload.path):
             os.remove(instance.upload.path)
 
+
 class PlayedFile(models.Model):
+    """To log played files by channels, PlayedFile objects are created."""
     file = models.ForeignKey(File, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     time_played = models.DateTimeField(auto_now_add=True)
 
 
 class Client(models.Model):
+    """A listener of a session. Clients are created using the Android
+    application.
+    """
     birth_date = models.DateField()
     gender = models.CharField(max_length=1)
 
@@ -98,11 +113,13 @@ class Client(models.Model):
 
 
 class JoinedClient(models.Model):
+    """A client becomes joined when it joins a running session."""
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 
 class Data(models.Model):
+    """Logged data from each client is stored in Data objects."""
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     client_time = models.DateTimeField()
@@ -110,6 +127,11 @@ class Data(models.Model):
 
 
 class ControllerPart(models.Model):
+    """A part of a channel controller. This is used to set all the options
+    using ControllerPartOptions.
+
+    A part can be a communicator, controller, picker or transitioner.
+    """
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
 
     COMMUNICATOR, CONTROLLER, PICKER, TRANSITIONER = range(4)
@@ -124,7 +146,8 @@ class ControllerPart(models.Model):
     name = models.CharField(max_length=50)
 
 
-class ControllerPartOptions(models.Model):
+class ControllerPartOption(models.Model):
+    """A single option for a channel controller part."""
     controller_part = models.ForeignKey(
         ControllerPart, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
