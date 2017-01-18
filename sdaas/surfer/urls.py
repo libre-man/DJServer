@@ -41,5 +41,8 @@ urlpatterns = [
     url(r'^im_alive/', views.im_alive, name='im_alive'),
     url(r'^iteration/', views.iteration, name='iteration'),
     url(r'^music_processed/', views.music_processed, name='music_processed'),
-    url(r'^controller_started/', views.controller_started, name='controller_started'),
+    url(r'^music_deleted/', views.music_deleted, name='music_deleted'),
+    url(r'^get_feedback/', views.get_feedback, name='get_feedback'),
+    url(r'^controller_started/', views.controller_started,
+        name='controller_started'),
 ]

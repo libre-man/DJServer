@@ -267,8 +267,16 @@ def im_alive(request):
     """Callback for when a channel controller is fully initialized and the web
     server is running.
 
-    Expected JSON: { 'id': int }
+    Expected JSON: { 'id': int,
+                     'options': {
+                          subject_name: {
+                              option_name: option in part options
+                          }
+                          in subjects
+                     }
+                    }
     """
+    # TODO: parse options json.
     if request.method == 'POST':
         data = utils.parse_json(request.body)
 
@@ -307,6 +315,22 @@ def music_processed(request):
                 instance.is_processed = True
                 instance.save()
 
+    return HttpResponse()
+
+
+@csrf_exempt
+def music_deleted(request):
+    """Callback for when the channel controller is finished deleting a music
+    file.
+    """
+    return HttpResponse()
+
+
+@csrf_exempt
+def get_feedback(request):
+    """API call from a channel controller to get feedback in a certain
+    timeframe.
+    """
     return HttpResponse()
 
 
