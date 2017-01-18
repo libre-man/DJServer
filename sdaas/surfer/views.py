@@ -280,12 +280,17 @@ def im_alive(request):
 
     Expected JSON: { 'id': int,
                      'options': {
-                          subject_name: {
-                              option_name: option in part options
+                          subject: {
+                              part {
+                                  option_name: option in part options
+                              }
+                              in parts
                           }
                           in subjects
                      }
                     }
+    option is of the type:
+        { 'name': string, 'doc': string, 'required': bool, 'fixed': bool }
     """
     # TODO: parse options json.
     if request.method == 'POST':
