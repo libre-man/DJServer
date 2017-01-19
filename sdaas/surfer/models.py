@@ -145,6 +145,9 @@ class ControllerPart(models.Model):
     category = models.IntegerField(choices=CATEGORY_CHOICES)
     name = models.CharField(max_length=50)
 
+    def str_to_category_choice(val):
+        return next(value for value, name in ControllerPart.CATEGORY_CHOICES if name.lower() == val.lower())
+
 
 class ControllerPartOption(models.Model):
     """A single option for a channel controller part."""

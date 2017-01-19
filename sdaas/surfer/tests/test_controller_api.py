@@ -54,7 +54,10 @@ class ControllerApiTests(TestCase):
         self.assertEqual(picker_part1.category, ControllerPart.PICKER)
 
         # Test option1
-        picker_part1_option1 = ControllerPartOption.filter(
+        picker_part1_option1 = ControllerPartOption.objects.filter(
             name='option1', controller_part=picker_part1)
         self.assertEqual(len(picker_part1_option1), 1)
         picker_part1_option1 = picker_part1_option1[0]
+
+    def test_im_alive_incorrect(self):
+        self.fail()

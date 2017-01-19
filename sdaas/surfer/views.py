@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render
 
 from . import utils
-from .models import Client, Session, JoinedClient, Channel, File
+from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption
 from .forms import SessionForm, UploadFileForm, ChannelForm
 
 
@@ -292,7 +292,6 @@ def im_alive(request):
     option is of the type:
         { 'name': string, 'doc': string, 'required': bool, 'fixed': bool }
     """
-    # TODO: parse options json.
     if request.method == 'POST':
         data = utils.parse_json(request.body)
 
@@ -302,6 +301,25 @@ def im_alive(request):
             if instance is not None:
                 instance.is_initialized = True
                 instance.save()
+
+                # TODO: refactor.
+                # TODO: handle bad cases.
+                for subject, parts in data['options'].items():
+                    category = ControllerPart.str_to_category_choice(subject)
+
+                    for name, part in parts.items():
+                        controller_part = ControllerPart(
+                            channel=instance, name=name, category=category)
+                        controller_part.save()
+
+                        for part_option_name, part_option in part.items():
+                            opt = ControllerPartOption(
+                                controller_part=controller_part,
+                                name=part_option_name,
+                                documentation=part_option['doc'],
+                                required=part_option['required'],
+                                fixed=part_option['fixed'])
+                            opt.save()
 
     return HttpResponse()
 
