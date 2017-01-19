@@ -43,7 +43,9 @@ class ControllerApiTests(TestCase):
             '/im_alive/', json.dumps(request), content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(self.channel.is_initialized)
+
+        channel = Channel.objects.get(pk=self.channel.id)
+        self.assertTrue(channel.is_initialized)
 
         # Test part 1
         picker_part1 = ControllerPart.objects.filter(name='picker_part1')
