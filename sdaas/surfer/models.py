@@ -21,13 +21,13 @@ class Channel(models.Model):
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     url = models.URLField(null=True)
-    color = models.IntegerField()
+    color = models.CharField(max_length=7)
 
     def __str__(self):
         return '%d: %s' % (self.id, self.url)
 
     def color_str(self):
-        return '#%0.6X' % self.color
+        return self.color
 
 
 def file_path(instance, filename):
