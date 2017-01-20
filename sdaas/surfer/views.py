@@ -295,8 +295,8 @@ def im_alive(request):
     if request.method == 'POST':
         data = utils.parse_json(request.body)
 
-        if isinstance(data["id"], int):
-            instance = Channel.objects.get(pk=data["id"])
+        if 'id' in data and isinstance(data['id'], int):
+            instance = Channel.objects.get(pk=data['id'])
 
             if instance is not None:
                 instance.is_initialized = True
@@ -320,7 +320,6 @@ def im_alive(request):
                                 required=part_option['required'],
                                 fixed=part_option['fixed'])
                             opt.save()
-
     return HttpResponse()
 
 

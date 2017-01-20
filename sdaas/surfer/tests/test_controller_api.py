@@ -59,5 +59,8 @@ class ControllerApiTests(TestCase):
         self.assertEqual(len(picker_part1_option1), 1)
         picker_part1_option1 = picker_part1_option1[0]
 
-    def test_im_alive_incorrect(self):
-        self.fail()
+    def test_im_alive_empty(self):
+        response = self.client.post(
+            '/im_alive/', json.dumps({}), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
