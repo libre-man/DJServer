@@ -1,11 +1,13 @@
 import time
 import json
+import tempfile
 
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
+from django.core.files.uploadedfile import SimpleUploadedFile
 
-from surfer.models import Session, Channel, ControllerPart, ControllerPartOption
+from surfer.models import Session, Channel, ControllerPart, ControllerPartOption, File
 
 
 class ControllerApiTests(TestCase):
@@ -64,3 +66,18 @@ class ControllerApiTests(TestCase):
             '/im_alive/', json.dumps({}), content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
+
+    def test_music_processed(self):
+        f = tempfile.NamedTemporaryFile(suffix='.mp3')
+        uploaded_file = SimpleUploadedFile(f.name, f.read())
+        File.objects.create_file(channel=self.channel, upload=uploaded_file)
+        music = File.objects.latest('id')
+
+        self.assertFalse(music.is_processed)
+
+        request = {'id': music.id}
+        response = self.client.post(
+            '/music_processed/', json.dumps(request), content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(File.objects.get(pk=music.id).is_processed)
