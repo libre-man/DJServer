@@ -309,7 +309,8 @@ def im_alive(request):
 
                     for name, part in parts.items():
                         controller_part = ControllerPart(
-                            channel=instance, name=name, category=category)
+                            channel=instance, name=name, category=category,
+                            short_doc=part['doc']['short'], long_doc=part['doc']['long'])
                         controller_part.save()
 
                         for part_option_name, part_option in part['parts'].items():
