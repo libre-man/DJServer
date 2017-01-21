@@ -32,14 +32,41 @@ class ControllerApiTests(TestCase):
     def test_im_alive_correct(self):
         self.assertFalse(self.channel.is_initialized)
 
-        request = {'id': self.channel.id, 'options': {
-            'picker': {
-                'picker_part1': {
-                    'option1': {'doc': 'option1_doc', 'required': False, 'fixed': True},
-                    'option2': {'doc': 'option2_doc', 'required': True, 'fixed': True}
+        request = {
+            "id": self.channel.id,
+            "options": {
+                "Picker": {
+                    "NCAPicker": {
+                        "doc": {
+                            "short": "A short description",
+                            "long": "A long description with\nnewlines"
+                        },
+                        "parts": {
+                            "arg1": {
+                                "fixed": False,
+                                "required": True,
+                                "doc": "You should use this like this!"
+                            }
+                        }
+                    }
+                },
+                "Controller": {
+                    "SimpleController": {
+                        "doc": {
+                            "short": "A short description",
+                            "long": "A long description with\nnewlines"
+                        },
+                        "parts": {
+                            "arg3": {
+                                "fixed": True,
+                                "required": False,
+                                "doc": ""
+                            }
+                        }
+                    }
                 }
             }
-        }}
+        }
 
         response = self.client.post(
             '/im_alive/', json.dumps(request), content_type='application/json')
@@ -50,14 +77,17 @@ class ControllerApiTests(TestCase):
         self.assertTrue(channel.is_initialized)
 
         # Test part 1
-        picker_part1 = ControllerPart.objects.filter(name='picker_part1')
+        picker_part1 = ControllerPart.objects.filter(name='NCAPicker')
         self.assertEqual(len(picker_part1), 1)
         picker_part1 = picker_part1[0]
         self.assertEqual(picker_part1.category, ControllerPart.PICKER)
+        self.assertEqual(picker_part1.short_doc, 'A short description')
+        self.assertEqual(picker_part1.long_doc,
+                         'A long description with\nnewlines')
 
         # Test option1
         picker_part1_option1 = ControllerPartOption.objects.filter(
-            name='option1', controller_part=picker_part1)
+            name='arg1', controller_part=picker_part1)
         self.assertEqual(len(picker_part1_option1), 1)
         picker_part1_option1 = picker_part1_option1[0]
 

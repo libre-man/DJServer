@@ -281,7 +281,7 @@ def im_alive(request):
     Expected JSON: { 'id': int,
                      'options': {
                           subject: {
-                              part {
+                              part_name: part {
                                   option_name: option in part options
                               }
                               in parts
@@ -312,7 +312,7 @@ def im_alive(request):
                             channel=instance, name=name, category=category)
                         controller_part.save()
 
-                        for part_option_name, part_option in part.items():
+                        for part_option_name, part_option in part['parts'].items():
                             opt = ControllerPartOption(
                                 controller_part=controller_part,
                                 name=part_option_name,
