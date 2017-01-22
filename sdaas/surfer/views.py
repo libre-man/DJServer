@@ -238,6 +238,7 @@ def join_session(request):
                 response_data['channels'] = []
                 for c in channels:
                     response_data['channels'].append({'channel_id': c.id,
+                                                      'name': c.name,
                                                       'color': c.color,
                                                       'url': c.url})
 
