@@ -26,6 +26,33 @@ def index(request):
 # -----------------------------------------------------------------------------
 
 @login_required
+def session_start(request, session_id):
+    # TODO: add error messages.
+    session = Session.objects.get(pk=session_id)
+
+    ready = True
+    channels = Channel.objects.filter(session=session)
+
+    # Check if session is ready.
+    for c in channels:
+        files = File.objects.filter(channel=c)
+
+        ready = c.is_initialized and bool(len(files)) and ready
+
+        for f in files:
+            ready = f.is_processed and ready
+
+    if ready:
+        session.is_starting = True
+        session.save()
+
+        for c in channels:
+            c.start()
+
+    return HttpResponseRedirect('/session/{}/'.format(session_id))
+
+
+@login_required
 def session_detail(request, session_id):
     session = Session.objects.get(id=session_id, host=request.user)
 

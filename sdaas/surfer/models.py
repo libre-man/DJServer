@@ -23,6 +23,9 @@ class Session(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
 
+    is_starting = models.BooleanField(default=False)
+    has_started = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 
@@ -70,8 +73,10 @@ class Channel(models.Model):
     url = models.URLField(null=True)
     color = models.CharField(max_length=7)
 
-    # Docker fields.
     is_initialized = models.BooleanField(default=False)
+    has_started = models.BooleanField(default=False)
+
+    # Docker fields.
     docker_id = models.CharField(max_length=100, default='')
     socket = models.CharField(max_length=100, default='')
     output_dir = models.CharField(max_length=100, default='')
@@ -87,6 +92,15 @@ class Channel(models.Model):
 
     def color_str(self):
         return self.color
+
+    def start(self):
+        request = {}
+
+        socket = HttpSocket(self.socket)
+        socket.request(method='POST', url='/start/', body=json.dumps(request),
+                       headers={'Content-type': 'application/json'})
+        response = socket.getresponse()
+        print(response.read().decode())
 
 
 @receiver(pre_delete, sender=Channel)
@@ -118,7 +132,7 @@ class FileManager(models.Manager):
         instance = self.create(channel=channel, upload=upload)
 
         request = {'file_location': os.path.join(
-            channel.input_dir, os.path.basename(instance.upload.name))}
+            channel.input_dir, os.path.basename(instance.upload.name)), 'id': instance.id}
 
         socket = HttpSocket(channel.socket)
         socket.request(method='POST', url='/add_music/', body=json.dumps(request),
