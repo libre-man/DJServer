@@ -33,5 +33,7 @@ urlpatterns = [
     # API urls:
     url(r'^log_data/', views.log_data, name='log_data'),
     url(r'^new_client/', views.new_client, name='new_client'),
+    url(r'^change_client/', views.change_client, name='change_client'),
+    url(r'^delete_client/', views.delete_client, name='delete_client'),
     url(r'^join_session/', views.join_session, name='join_session'),
 ]
