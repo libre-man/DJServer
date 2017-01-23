@@ -1,6 +1,21 @@
 from datetime import datetime
+
 import json
 import time
+import http.client
+import socket
+
+
+class HttpSocket(http.client.HTTPConnection):
+
+    def __init__(self, path, *args, **kwargs):
+        super(HttpSocket, self).__init__(path, *args, **kwargs)
+        self.path = path
+        self.sock = None
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.connect(self.path)
 
 
 def parse_client_json(request, required_keys=None):

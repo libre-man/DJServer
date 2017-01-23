@@ -1,5 +1,10 @@
 import os
+import docker
+import json
 
+from .utils import HttpSocket
+
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
@@ -27,8 +32,32 @@ class ChannelManager(models.Manager):
     def create_channel(self, session, name="Default", color=0):
         channel = self.create(name=name, session=session, color=color)
 
-        # TODO: Create docker container.
+        # Create docker container.
+        client = docker.from_env()
 
+        socket_dir = '/tmp/sdaas_controller_{}/'.format(channel.id)
+        channel.socket = os.path.join(socket_dir, 'sdaas.socket')
+
+        channel.input_dir = '/home/dj_feet/input'
+        channel.output_dir = os.path.join(
+            settings.OUTPUT_DIR, get_input_dir(channel.id))
+
+        environment = ['SDAAS_ID={}'.format(channel.id),
+                       'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
+                       'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
+                       'SDAAS_REMOTE_URL=http://10.1.10.181:8080',
+                       'SDAAS_SOCKET={}'.format(channel.socket)]
+
+        volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},
+                   get_input_dir(channel.id): {'bind': channel.input_dir, 'mode': 'rw'},
+                   '/tmp/testoutput': {'bind': '/home/dj_feet/output', 'mode': 'rw'}
+                   }
+
+        container = client.containers.run('controller', environment=environment,
+                                          volumes=volumes, detach=True, publish_all_ports=True)
+
+        channel.docker_id = container.id
+        channel.save()
         return channel
 
 
@@ -39,10 +68,19 @@ class Channel(models.Model):
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     url = models.URLField(null=True)
+    color = models.CharField(max_length=7)
+
+    # Docker fields.
     is_initialized = models.BooleanField(default=False)
+    docker_id = models.CharField(max_length=100, default='')
+    socket = models.CharField(max_length=100, default='')
+    output_dir = models.CharField(max_length=100, default='')
+    input_dir = models.CharField(max_length=100, default='')
+
+    # Feedback
+    epoch = models.BigIntegerField(default=0)
 
     objects = ChannelManager()
-    color = models.CharField(max_length=7)
 
     def __str__(self):
         return '%d: %s' % (self.id, self.url)
@@ -53,8 +91,21 @@ class Channel(models.Model):
 
 @receiver(pre_delete, sender=Channel)
 def channel_delete(sender, instance, **kwargs):
-    # TODO: Kill docker container.
-    pass
+    # Delete docker
+    client = docker.from_env()
+
+    if instance.docker_id == '':
+        return
+
+    try:
+        container = client.containers.get(instance.docker_id)
+        container.kill()
+    except docker.errors.NotFound:
+        pass
+
+
+def get_input_dir(channel_id):
+    return os.path.join(settings.MEDIA_ROOT, 'channels/{}'.format(channel_id))
 
 
 def file_path(instance, filename):
@@ -66,7 +117,14 @@ class FileManager(models.Manager):
     def create_file(self, channel, upload):
         instance = self.create(channel=channel, upload=upload)
 
-        # TODO: Send request to channel docker container: /add_music
+        request = {'file_location': os.path.join(
+            channel.input_dir, os.path.basename(instance.upload.name))}
+
+        socket = HttpSocket(channel.socket)
+        socket.request(method='POST', url='/add_music/', body=json.dumps(request),
+                       headers={'Content-type': 'application/json'})
+        response = socket.getresponse()
+        print(response.read().decode())
 
         return instance
 
@@ -77,7 +135,9 @@ class File(models.Model):
     """
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     upload = models.FileField(upload_to=file_path)
+
     is_processed = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
     objects = FileManager()
 
@@ -87,10 +147,20 @@ class File(models.Model):
 
 @receiver(pre_delete, sender=File)
 def file_delete(sender, instance, **kwargs):
-    # TODO: send request to docker container: /delete_music
+    # TODO: maybe rather set the is_deleted flag and only fully delete it
+    # when a music_deleted response is received.
 
     if instance.upload:
         if os.path.isfile(instance.upload.path):
+            request = {'file_location': os.path.join(
+                instance.channel.input_dir, os.path.basename(instance.upload.name))}
+
+            socket = HttpSocket(instance.channel.socket)
+            socket.request(method='POST', url='/delete_music/', body=json.dumps(request),
+                           headers={'Content-type': 'application/json'})
+            response = socket.getresponse()
+            print(response.read().decode())
+
             os.remove(instance.upload.path)
 
 
