@@ -40,7 +40,7 @@
                                 <td>{{ option.name }}</td>
                                 <td colspan="2">
                                     {% if option.value == "" %}
-                                        Not set
+                                        <span class="text-muted">Not set</span>
                                     {% else %}
                                         {{ option.value }}
                                     {% endif %}

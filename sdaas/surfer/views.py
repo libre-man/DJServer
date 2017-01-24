@@ -142,8 +142,6 @@ def channel_detail(request, channel_id):
                 part = part[0].name
             parts.append((c[0], c[1], part, options))
 
-        print(parts)
-
         files = File.objects.filter(channel=channel)
         form = UploadFileForm()
 
@@ -265,8 +263,44 @@ def channel_part_options(request, channel_id, category_id):
     return render(request, 'channel_part_options_settings.html', {'channel': channel, 'part': part, 'form': form})
 
 
+@login_required
+def channel_commit_settings(request, channel_id):
+    channel = Channel.objects.get(pk=channel_id)
+
+    request = {}
+    autocast = utils.AutoCast()
+
+    for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
+        part = ControllerPart.objects.filter(
+            channel=channel, is_set=True, category=cat_id)[0]
+
+        part_json = {}
+        part_json['name'] = part.name
+
+        options_json = {}
+        for option in ControllerPartOption.objects.filter(controller_part=part, fixed=False).exclude(value=''):
+            options_json[option.name] = autocast(option.value)
+
+        part_json['options'] = options_json
+        request[cat_name] = part_json
+
+    print(request)
+    # Send request to docker.
+    # TODO: maybe better in channel model?
+    socket = utils.HttpSocket(channel.socket)
+    socket.request(method='POST', url='/set_options/', body=json.dumps(request),
+                   headers={'Content-type': 'application/json'})
+
+    response = socket.getresponse()
+
+    print('response of commit')
+    print(response.read().decode())
+
+    return HttpResponseRedirect('/channel/{}/'.format(channel.id))
+
 # Music file upload
 # -----------------------------------------------------------------------------
+
 
 @login_required
 def channel_upload(request, channel_id):
