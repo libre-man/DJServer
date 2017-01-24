@@ -24,8 +24,10 @@
                 <dd>{{ session.join_code }}</dd>
             </dl>
 
-            {% bootstrap_button "Advanced settings" href="/session/"|addstr:session.id|addstr:"/settings/" %}
-            {% bootstrap_button "Start session" href="/session/"|addstr:session.id|addstr:"/start/" button_class="btn-primary" %}
+            {% if not session.has_started or not session.is_starting %}
+                {% bootstrap_button "Advanced settings" href="/session/"|addstr:session.id|addstr:"/settings/" %}
+                {% bootstrap_button "Start session" href="/session/"|addstr:session.id|addstr:"/start/" button_class="btn-primary" %}
+            {% endif %}
         </div>
 
         <div class="col-md-6">

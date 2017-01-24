@@ -29,6 +29,10 @@ urlpatterns = [
         views.channel_delete, name='channel_delete'),
     url(r'^channel/(?P<channel_id>[0-9]+)/upload/$',
         views.channel_upload, name='channel_upload'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/settings/$',
+        views.channel_settings, name='channel_settings'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/settings/(?P<category_id>[0-9]+)/$',
+        views.channel_part_options, name='channel_part_options'),
 
     # Files:
     url(r'^file/(?P<file_id>[0-9]+)/delete/$',

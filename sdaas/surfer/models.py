@@ -231,6 +231,8 @@ class ControllerPart(models.Model):
     short_doc = models.CharField(max_length=128)
     long_doc = models.TextField()
 
+    is_set = models.BooleanField(default=False)
+
     def str_to_category_choice(val):
         return next(value for value, name in ControllerPart.CATEGORY_CHOICES if name.lower() == val.lower())
 
@@ -243,3 +245,4 @@ class ControllerPartOption(models.Model):
     documentation = models.TextField()
     required = models.BooleanField(default=False)
     fixed = models.BooleanField(default=False)
+    value = models.TextField(default='')

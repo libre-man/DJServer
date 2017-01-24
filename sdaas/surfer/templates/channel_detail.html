@@ -16,6 +16,44 @@
                 <dt>Color</dt>
                 <dd><div class="color-bar" style="background-color:{{ channel.color_str }}"></div></dd>
             </dl>
+
+            <h3>Settings</h3>
+
+            <table class="table table-striped">
+            {% for cat_id, cat, part, options in parts %}
+                <thead> 
+                    <tr>
+                        <th>{{ cat }}</th>
+                        <th>{{ part }}</th>
+                        <th style="text-align:right">
+                            {% if part != "Not set" and options|length > 0 %}
+                                {% bootstrap_button "Edit options" href="/channel/"|addstr:channel.id|addstr:"/settings/"|addstr:cat_id|addstr:"/" %}
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead> 
+
+                {% if options|length > 0 %}
+                    <tbody>
+                        {% for option in options %}
+                            <tr>
+                                <td>{{ option.name }}</td>
+                                <td colspan="2">
+                                    {% if option.value == "" %}
+                                        Not set
+                                    {% else %}
+                                        {{ option.value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                {% endif %}
+            {% endfor %}
+            </table>
+
+
+            {% bootstrap_button "Edit part settings" href="/channel/"|addstr:channel.id|addstr:"/settings/" %}
         </div>
 
         <div class="col-md-6">
@@ -31,7 +69,11 @@
                     <tr>
                         <td>{{ f.filename }}</td>
                         <td>
-                            {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
+                            {% if f.is_processed %}
+                                {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
+                            {% else %}
+                                Processing...
+                            {% endif %}
                         </td>
 
                     </tr>

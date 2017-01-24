@@ -126,10 +126,28 @@ def channel_detail(request, channel_id):
     channel = Channel.objects.get(id=channel_id)
 
     if channel is not None:
+        choices = ControllerPart.CATEGORY_CHOICES
+
+        parts = []
+        for c in choices:
+            part = ControllerPart.objects.filter(
+                channel=channel, is_set=True, category=c[0])
+
+            options = []
+            if len(part) == 0:
+                part = 'Not set'
+            else:
+                options = ControllerPartOption.objects.filter(
+                    controller_part=part[0], fixed=False)
+                part = part[0].name
+            parts.append((c[0], c[1], part, options))
+
+        print(parts)
+
         files = File.objects.filter(channel=channel)
         form = UploadFileForm()
 
-    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form})
+    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form, 'parts': parts})
 
 
 @login_required
@@ -182,6 +200,18 @@ def channel_delete(request, channel_id):
         return HttpResponseRedirect('/session/{}/'.format(session_id))
 
     return HttpResponseRedirect('/')
+
+
+@login_required
+@permission_required('surfer.change_channel')
+def channel_settings(request, channel_id):
+    return HttpResponse()
+
+
+@login_required
+@permission_required('surfer.change_channel')
+def channel_part_options(request, channel_id, category_id):
+    return HttpResponse()
 
 
 # Music file upload
@@ -322,6 +352,7 @@ def im_alive(request):
     """
     if request.method == 'POST':
         data = utils.parse_json(request.body)
+        print(data)
 
         if 'id' in data and isinstance(data['id'], int):
             instance = Channel.objects.get(pk=data['id'])
