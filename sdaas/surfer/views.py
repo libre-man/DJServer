@@ -229,6 +229,24 @@ def delete_client(request):
                         content_type='application/json')
 
 @csrf_exempt
+def check_client(request):
+    response_data = {}
+    response_data['success'] = False
+
+    if request.method == 'POST':
+        data, time = utils.parse_client_json(
+            request.body, {('client_id', int)})
+
+        if data is not None and time is not None:
+            client = Client.objects.get(pk=client_id)
+
+            if client is not None:
+                response_data['success'] = True
+
+    return HttpResponse(json.dumps(response_data),
+                        content_type='application/json')
+
+@csrf_exempt
 def join_session(request):
     response_data = {}
     response_data['success'] = False
