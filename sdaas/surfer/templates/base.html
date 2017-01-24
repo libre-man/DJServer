@@ -14,38 +14,40 @@
 
 <body>
     <header class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>sdaas</h1>
-                <span>Current server time: {% now "d/m/Y H:i:s" %}</span>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <img src="/static/surfer/sdaas.png" alt="sdaas" height="80px"/>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <ul class="nav nav-tabs">
-                    <li role="presentation"><a href="/">Home</a></li>
-                    {% block menubar %}
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs">
+                        <li role="presentation"><a href="/">Home</a></li>
+                        {% block menubar %}
 
-                    {% endblock %}
-                </ul>
+                        {% endblock %}
+                    </ul>
+                </div>
             </div>
         </div>
     </header>
 
-    <section class="container-fluid">
-        {% block content %}{% endblock %}
-    </section>
+    <div class="container">
+        <section class="container-fluid">
+            {% block content %}{% endblock %}
+        </section>
+    </div>
 
-    <footer class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                {% block footer %}
+    <footer class="footer">
+        <div class="container">
+            {% block footer %}
 
-                <p>Copyright &copy; 2017 sdaas.nl<p>
+                <p class="text-muted">Current server time: {% now "d/m/Y H:i:s" %} ||
+                Copyright &copy; 2017 Devin Hillenius, Thomas Schaper &amp; Youri Voet - University of Amsterdam<p>
 
-                {% endblock %}
-            </div>
+            {% endblock %}
         </div>
     </footer>
 
