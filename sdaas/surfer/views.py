@@ -195,7 +195,7 @@ def change_client(request):
             request.body, {('client_id', int), ('birth_year', int), ('birth_month', int), ('birth_day', int), ('gender', str)})
 
         if data is not None and time is not None:
-            client = Client.objects.get(pk=client_id)
+            client = Client.objects.get(pk=data['client_id'])
             if client is not None:
                 client.birth_date = datetime.date(data['birth_year'],
                                                   data['birth_month'],
@@ -218,7 +218,7 @@ def delete_client(request):
             request.body, {('client_id', int)})
 
         if data is not None and time is not None:
-            client = Client.objects.get(pk=client_id)
+            client = Client.objects.get(pk=data['client_id'])
 
             if client is not None:
                 client.delete()
@@ -238,7 +238,7 @@ def check_client(request):
             request.body, {('client_id', int)})
 
         if data is not None and time is not None:
-            client = Client.objects.get(pk=client_id)
+            client = Client.objects.get(pk=data['client_id'])
 
             if client is not None:
                 response_data['success'] = True
