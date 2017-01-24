@@ -36,4 +36,5 @@ urlpatterns = [
     url(r'^change_client/', views.change_client, name='change_client'),
     url(r'^delete_client/', views.delete_client, name='delete_client'),
     url(r'^join_session/', views.join_session, name='join_session'),
+    url(r'^check_client/', views.check_client, name='check_client'),
 ]
