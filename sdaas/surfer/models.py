@@ -48,7 +48,7 @@ class ChannelManager(models.Manager):
         environment = ['SDAAS_ID={}'.format(channel.id),
                        'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
                        'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
-                       'SDAAS_REMOTE_URL=http://10.1.10.181:8080',
+                       'SDAAS_REMOTE_URL=http://145.109.32.196:8080',
                        'SDAAS_SOCKET={}'.format(channel.socket)]
 
         volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},
@@ -114,7 +114,7 @@ def channel_delete(sender, instance, **kwargs):
     try:
         container = client.containers.get(instance.docker_id)
         container.kill()
-    except docker.errors.NotFound:
+    except (docker.errors.NotFound, docker.errors.APIError) as e:
         pass
 
 
@@ -175,7 +175,8 @@ def file_delete(sender, instance, **kwargs):
             response = socket.getresponse()
             print(response.read().decode())
 
-            os.remove(instance.upload.path)
+            # Controller removes.
+            #os.remove(instance.upload.path)
 
 
 class PlayedFile(models.Model):
@@ -235,6 +236,9 @@ class ControllerPart(models.Model):
 
     def str_to_category_choice(val):
         return next(value for value, name in ControllerPart.CATEGORY_CHOICES if name.lower() == val.lower())
+
+    def __str__(self):
+        return self.name
 
 
 class ControllerPartOption(models.Model):

@@ -1,7 +1,7 @@
 from django.forms import ModelForm, DateTimeInput
 from django import forms
 
-from .models import Session, Channel
+from .models import Session, Channel, ControllerPart, ControllerPartOption
 from .widgets import ColorPicker
 
 
@@ -11,8 +11,10 @@ class SessionForm(ModelForm):
         model = Session
         fields = ('name', 'start', 'end', 'join_code')
         widgets = {
-            'start': DateTimeInput(format='%Y-%m-%d %H:%M:%S', attrs={'placeholder': '2017-01-13 14:30:59'}),
-            'end': DateTimeInput(format='%Y-%m-%d %H:%M:%S', attrs={'placeholder': '2017-01-13 14:30:59'}),
+            'start': DateTimeInput(format='%Y-%m-%d %H:%M:%S',
+                                   attrs={'placeholder': '2017-01-13 14:30:59'}),
+            'end': DateTimeInput(format='%Y-%m-%d %H:%M:%S',
+                                 attrs={'placeholder': '2017-01-13 14:30:59'}),
         }
         help_texts = {
             'start': 'The start date and time of the session',
@@ -34,3 +36,26 @@ class ChannelForm(ModelForm):
 
 class UploadFileForm(forms.Form):
     upload = forms.FileField()
+
+
+class PartSelectForm(forms.Form):
+
+    def __init__(self, channel, *args, **kwargs):
+        super(PartSelectForm, self).__init__(*args, **kwargs)
+
+        for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
+            self.fields[cat_name] = forms.ModelChoiceField(
+                queryset=ControllerPart.objects.filter(category=cat_id, channel=channel), empty_label="Not set")
+
+
+class PartOptionForm(forms.Form):
+
+    def __init__(self, controller_part, *args, **kwargs):
+        super(PartOptionForm, self).__init__(*args, **kwargs)
+
+        options = ControllerPartOption.objects.filter(
+            controller_part=controller_part, fixed=False)
+
+        for option in options:
+            self.fields[option.name] = forms.CharField(
+                required=option.required)

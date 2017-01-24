@@ -12,7 +12,7 @@ from django.shortcuts import render
 
 from . import utils
 from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption
-from .forms import SessionForm, UploadFileForm, ChannelForm
+from .forms import SessionForm, UploadFileForm, ChannelForm, PartSelectForm, PartOptionForm
 
 
 @login_required
@@ -205,13 +205,64 @@ def channel_delete(request, channel_id):
 @login_required
 @permission_required('surfer.change_channel')
 def channel_settings(request, channel_id):
-    return HttpResponse()
+    instance = Channel.objects.get(pk=channel_id)
+
+    if request.method == 'POST':
+        form = PartSelectForm(instance, request.POST)
+
+        if form.is_valid():
+            ControllerPart.objects.filter(
+                channel=instance, is_set=True).update(is_set=False)
+
+            for key, part in form.cleaned_data.items():
+                part.is_set = True
+                part.save()
+
+            return HttpResponseRedirect('/channel/{}/'.format(instance.id))
+    else:
+        initial_values = {}
+
+        for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
+            parts = ControllerPart.objects.filter(
+                channel=instance, category=cat_id, is_set=True)
+            if len(parts) == 1:
+                initial_values[cat_name] = parts[0].pk
+
+        form = PartSelectForm(instance, initial=initial_values)
+
+    return render(request, 'channel_settings.html', {'channel': instance, 'form': form})
 
 
 @login_required
 @permission_required('surfer.change_channel')
 def channel_part_options(request, channel_id, category_id):
-    return HttpResponse()
+    channel = Channel.objects.get(pk=channel_id)
+    part = ControllerPart.objects.filter(
+        channel=channel, category=category_id)[0]
+
+    if request.method == 'POST':
+        form = PartOptionForm(part, request.POST)
+
+        if form.is_valid():
+            for name, value in form.cleaned_data.items():
+                option = ControllerPartOption.objects.filter(
+                    controller_part=part, name=name)[0]
+                option.value = value
+                option.save()
+            return HttpResponseRedirect('/channel/{}/'.format(channel.id))
+
+    else:
+        options = ControllerPartOption.objects.filter(
+            controller_part=part, fixed=False)
+        initial_values = {}
+
+        for option in options:
+            if option.value != '':
+                initial_values[option.name] = option.value
+
+        form = PartOptionForm(part, initial=initial_values)
+
+    return render(request, 'channel_part_options_settings.html', {'channel': channel, 'part': part, 'form': form})
 
 
 # Music file upload
@@ -357,7 +408,7 @@ def im_alive(request):
         if 'id' in data and isinstance(data['id'], int):
             instance = Channel.objects.get(pk=data['id'])
 
-            if instance is not None:
+            if instance is not None and not instance.is_initialized:
                 instance.is_initialized = True
                 instance.save()
 
