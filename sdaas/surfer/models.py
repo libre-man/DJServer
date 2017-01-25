@@ -43,17 +43,21 @@ class ChannelManager(models.Manager):
 
         channel.input_dir = '/home/dj_feet/input'
         channel.output_dir = os.path.join(
-            settings.OUTPUT_DIR, get_input_dir(channel.id))
+            settings.OUTPUT_DIR, str(channel.id))
+
+        # TODO: on delete remove
+        os.makedirs(channel.output_dir)
 
         environment = ['SDAAS_ID={}'.format(channel.id),
                        'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
                        'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
-                       'SDAAS_REMOTE_URL=http://145.109.32.196:8080',
+                       'PYTHONUNBUFFERED=False',
+                       'SDAAS_REMOTE_URL=http://10.1.10.181:8080',
                        'SDAAS_SOCKET={}'.format(channel.socket)]
 
         volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},
                    get_input_dir(channel.id): {'bind': channel.input_dir, 'mode': 'rw'},
-                   '/tmp/testoutput': {'bind': '/home/dj_feet/output', 'mode': 'rw'}
+                   channel.output_dir: {'bind': '/home/dj_feet/output', 'mode': 'rw'}
                    }
 
         container = client.containers.run('controller', environment=environment,
@@ -74,6 +78,7 @@ class Channel(models.Model):
     color = models.CharField(max_length=7)
 
     is_initialized = models.BooleanField(default=False)
+    settings_committed = models.BooleanField(default=False)
     has_started = models.BooleanField(default=False)
 
     # Docker fields.
@@ -100,6 +105,7 @@ class Channel(models.Model):
         socket.request(method='POST', url='/start/', body=json.dumps(request),
                        headers={'Content-type': 'application/json'})
         response = socket.getresponse()
+        print("starting channel")
         print(response.read().decode())
 
 
@@ -169,14 +175,17 @@ def file_delete(sender, instance, **kwargs):
             request = {'file_location': os.path.join(
                 instance.channel.input_dir, os.path.basename(instance.upload.name))}
 
-            socket = HttpSocket(instance.channel.socket)
-            socket.request(method='POST', url='/delete_music/', body=json.dumps(request),
-                           headers={'Content-type': 'application/json'})
-            response = socket.getresponse()
-            print(response.read().decode())
+            try:
+                socket = HttpSocket(instance.channel.socket)
+                socket.request(method='POST', url='/delete_music/', body=json.dumps(request),
+                               headers={'Content-type': 'application/json'})
+                response = socket.getresponse()
+                print(response.read().decode())
+            except FileNotFoundError:
+                pass
 
             # Controller removes.
-            #os.remove(instance.upload.path)
+            # os.remove(instance.upload.path)
 
 
 class PlayedFile(models.Model):

@@ -24,9 +24,14 @@
                 <dd>{{ session.join_code }}</dd>
             </dl>
 
-            {% if not session.has_started or not session.is_starting %}
-                {% bootstrap_button "Advanced settings" href="/session/"|addstr:session.id|addstr:"/settings/" %}
+            {% if not session.has_started and not session.is_starting %}
                 {% bootstrap_button "Start session" href="/session/"|addstr:session.id|addstr:"/start/" button_class="btn-primary" %}
+            {% endif %}
+
+            {% if session.is_starting %}
+                <span>Session is starting...</span>
+            {% elif session.has_started %}
+                <span>Session has started.</span>
             {% endif %}
         </div>
 
@@ -49,8 +54,11 @@
                         <td>
                             {% if c.is_initialized %}
                                 {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
-                                {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
-                                {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger" %}
+
+                                {% if not session.is_starting and not session.has_started %}
+                                    {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
+                                    {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger" %}
+                                {% endif %}
                             {% else %}
                                 Initializing channel...
                             {% endif %}
@@ -59,8 +67,11 @@
                 {% endfor %}
             </table>
 
-            {% bootstrap_button "Add new channel" href="/session/"|addstr:session.id|addstr:"/channel/add/" %}
 
+
+            {% if not session.is_starting and not session.has_started %}
+                {% bootstrap_button "Add new channel" href="/session/"|addstr:session.id|addstr:"/channel/add/" %}
+            {% endif %}
         </div>
     </div>
 

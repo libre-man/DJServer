@@ -59,8 +59,10 @@
             </table>
 
 
-            {% bootstrap_button "Edit part settings" href="/channel/"|addstr:channel.id|addstr:"/settings/" %}
-            {% bootstrap_button "Commit settings" href="/channel/"|addstr:channel.id|addstr:"/commit/" button_class="btn-primary" %}
+            {% if not channel.settings_committed %}
+                {% bootstrap_button "Edit part settings" href="/channel/"|addstr:channel.id|addstr:"/settings/" %}
+                {% bootstrap_button "Commit settings" href="/channel/"|addstr:channel.id|addstr:"/commit/" button_class="btn-primary" %}
+            {% endif %}
         </div>
 
         <div class="col-md-6">

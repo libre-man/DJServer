@@ -236,7 +236,7 @@ def channel_settings(request, channel_id):
 def channel_part_options(request, channel_id, category_id):
     channel = Channel.objects.get(pk=channel_id)
     part = ControllerPart.objects.filter(
-        channel=channel, category=category_id)[0]
+        channel=channel, category=category_id, is_set=True)[0]
 
     if request.method == 'POST':
         form = PartOptionForm(part, request.POST)
@@ -272,8 +272,13 @@ def channel_commit_settings(request, channel_id):
 
     for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
         part = ControllerPart.objects.filter(
-            channel=channel, is_set=True, category=cat_id)[0]
+            channel=channel, is_set=True, category=cat_id)
 
+        # Make sure every part is set.
+        if len(part) == 0:
+            return HttpResponseRedirect('/channel/{}/'.format(channel.id))
+
+        part = part[0]
         part_json = {}
         part_json['name'] = part.name
 
@@ -295,6 +300,9 @@ def channel_commit_settings(request, channel_id):
 
     print('response of commit')
     print(response.read().decode())
+
+    channel.settings_committed = True
+    channel.save()
 
     return HttpResponseRedirect('/channel/{}/'.format(channel.id))
 
