@@ -51,6 +51,12 @@
         </div>
     </footer>
 
-    {% bootstrap_javascript %}
+    {% bootstrap_javascript jquery=1 %}
+
+    <script type="text/javascript">
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
 </body>
 </html>

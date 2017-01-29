@@ -59,3 +59,4 @@ class PartOptionForm(forms.Form):
         for option in options:
             self.fields[option.name] = forms.CharField(
                 required=option.required)
+            self.fields[option.name].help_text = option.documentation

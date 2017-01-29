@@ -1,6 +1,7 @@
 import os
 import docker
 import json
+import shutil
 
 from .utils import HttpSocket
 
@@ -23,6 +24,7 @@ class Session(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
 
+    # TODO: figure this out by looping over all channels
     is_starting = models.BooleanField(default=False)
     has_started = models.BooleanField(default=False)
 
@@ -45,7 +47,6 @@ class ChannelManager(models.Manager):
         channel.output_dir = os.path.join(
             settings.OUTPUT_DIR, str(channel.id))
 
-        # TODO: on delete remove
         os.makedirs(channel.output_dir)
 
         environment = ['SDAAS_ID={}'.format(channel.id),
@@ -77,9 +78,15 @@ class Channel(models.Model):
     url = models.URLField(null=True)
     color = models.CharField(max_length=7)
 
-    is_initialized = models.BooleanField(default=False)
-    settings_committed = models.BooleanField(default=False)
-    has_started = models.BooleanField(default=False)
+    INITIALIZING, INITIALIZED, COMMITTED, STARTING, STARTED = range(5)
+    STATE_CHOICES = {
+        (INITIALIZING, 'Initializing'),
+        (INITIALIZED, 'Initialized'),
+        (COMMITTED, 'Committed'),
+        (STARTING, 'Starting'),
+        (STARTED, 'Started'),
+    }
+    state = models.IntegerField(choices=STATE_CHOICES, default=INITIALIZING)
 
     # Docker fields.
     docker_id = models.CharField(max_length=100, default='')
@@ -111,6 +118,11 @@ class Channel(models.Model):
 
 @receiver(pre_delete, sender=Channel)
 def channel_delete(sender, instance, **kwargs):
+    try:
+        shutil.rmtree(instance.output_dir)
+    except FileNotFoundError:
+        pass
+
     # Delete docker
     client = docker.from_env()
 
@@ -184,8 +196,7 @@ def file_delete(sender, instance, **kwargs):
             except FileNotFoundError:
                 pass
 
-            # Controller removes.
-            # os.remove(instance.upload.path)
+            os.remove(instance.upload.path)
 
 
 class PlayedFile(models.Model):

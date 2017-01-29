@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from . import utils
 from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption
@@ -37,7 +37,7 @@ def session_start(request, session_id):
     for c in channels:
         files = File.objects.filter(channel=c)
 
-        ready = c.is_initialized and bool(len(files)) and ready
+        ready = c.state == Channel.INITIALIZED and bool(len(files)) and ready
 
         for f in files:
             ready = f.is_processed and ready
@@ -145,7 +145,12 @@ def channel_detail(request, channel_id):
         files = File.objects.filter(channel=channel)
         form = UploadFileForm()
 
-    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form, 'parts': parts})
+    error = ''
+    if 'error' in request.session:
+        error = request.session['error']
+        request.session['error'] = ''
+
+    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form, 'parts': parts, 'error': error})
 
 
 @login_required
@@ -267,7 +272,7 @@ def channel_part_options(request, channel_id, category_id):
 def channel_commit_settings(request, channel_id):
     channel = Channel.objects.get(pk=channel_id)
 
-    request = {}
+    json_request = {}
     autocast = utils.AutoCast()
 
     for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
@@ -276,6 +281,7 @@ def channel_commit_settings(request, channel_id):
 
         # Make sure every part is set.
         if len(part) == 0:
+            request.session['error'] = 'Not all parts are set!'
             return HttpResponseRedirect('/channel/{}/'.format(channel.id))
 
         part = part[0]
@@ -283,17 +289,24 @@ def channel_commit_settings(request, channel_id):
         part_json['name'] = part.name
 
         options_json = {}
-        for option in ControllerPartOption.objects.filter(controller_part=part, fixed=False).exclude(value=''):
+        for option in ControllerPartOption.objects.filter(controller_part=part, fixed=False):
+            if option.value == '':
+                if option.required:
+                    request.session[
+                        'error'] = 'Not all required options are set!'
+                    return HttpResponseRedirect('/channel/{}/'.format(channel.id))
+                continue
+
             options_json[option.name] = autocast(option.value)
 
         part_json['options'] = options_json
-        request[cat_name] = part_json
+        json_request[cat_name] = part_json
 
     print(request)
     # Send request to docker.
     # TODO: maybe better in channel model?
     socket = utils.HttpSocket(channel.socket)
-    socket.request(method='POST', url='/set_options/', body=json.dumps(request),
+    socket.request(method='POST', url='/set_options/', body=json.dumps(json_request),
                    headers={'Content-type': 'application/json'})
 
     response = socket.getresponse()
@@ -301,7 +314,7 @@ def channel_commit_settings(request, channel_id):
     print('response of commit')
     print(response.read().decode())
 
-    channel.settings_committed = True
+    channel.state = Channel.COMMITTED
     channel.save()
 
     return HttpResponseRedirect('/channel/{}/'.format(channel.id))
@@ -450,12 +463,10 @@ def im_alive(request):
         if 'id' in data and isinstance(data['id'], int):
             instance = Channel.objects.get(pk=data['id'])
 
-            if instance is not None and not instance.is_initialized:
-                instance.is_initialized = True
+            if instance is not None and instance.state == Channel.INITIALIZING:
+                instance.state = Channel.INITIALIZED
                 instance.save()
 
-                # TODO: refactor.
-                # TODO: handle bad cases.
                 for subject, parts in data['options'].items():
                     category = ControllerPart.str_to_category_choice(subject)
 
@@ -526,4 +537,26 @@ def controller_started(request):
 
     Expected JSON: { 'id': int, 'epoch': int }
     """
+    if request.method == 'POST':
+        print(request.body)
+        data = utils.parse_json(request.body)
+
+        if isinstance(data['id'], int) and isinstance(data['epoch'], int):
+            channel = Channel.objects.get(pk=data['id'])
+
+            channel.state = Channel.STARTED
+            channel.epoch = data['epoch']
+            channel.save()
+
+            # TODO: fix.
+            if len(Channel.objects.filter(session=channel.session)) ==\
+               len(Channel.objects.filter(session=channel.session, has_started=True)):
+                channel.session.has_started = True
+                channel.session.save()
+
+    return HttpResponse()
+
+
+@csrf_exempt
+def died(request):
     return HttpResponse()

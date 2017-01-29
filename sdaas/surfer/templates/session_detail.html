@@ -52,10 +52,10 @@
                         <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
                         <td><div class="color-bar" style="background-color:{{ c.color_str }}"></div></td>
                         <td>
-                            {% if c.is_initialized %}
+                            {% if c.state != c.INITIALIZING %}
                                 {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
 
-                                {% if not session.is_starting and not session.has_started %}
+                                {% if c.state == c.INITIALIZED or c.state == c.COMMITTED %}
                                     {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
                                     {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger" %}
                                 {% endif %}
