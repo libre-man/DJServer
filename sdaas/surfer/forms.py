@@ -44,8 +44,16 @@ class PartSelectForm(forms.Form):
         super(PartSelectForm, self).__init__(*args, **kwargs)
 
         for cat_id, cat_name in ControllerPart.CATEGORY_CHOICES:
+            parts = ControllerPart.objects.filter(
+                category=cat_id, channel=channel)
+
             self.fields[cat_name] = forms.ModelChoiceField(
-                queryset=ControllerPart.objects.filter(category=cat_id, channel=channel), empty_label="Not set")
+                queryset=parts, empty_label="Not set")
+
+            self.fields[cat_name].help_text = ''
+            for p in parts:
+                self.fields[
+                    cat_name].help_text += '<div class="part-help">{}<br/>{}</div>'.format(p.name, p.long_doc)
 
 
 class PartOptionForm(forms.Form):
