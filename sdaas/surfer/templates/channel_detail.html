@@ -75,7 +75,7 @@
 
         <div class="col-md-6">
             <h3>Music</h3>
-            {% if channel.state == channel.COMMITTED %}
+            {% if channel.state >= channel.COMMITTED %}
                 <table class="table">
                     <tr>
                         <th>File</th>
@@ -86,10 +86,12 @@
                         <tr>
                             <td>{{ f.filename }}</td>
                             <td>
-                                {% if f.is_processed %}
-                                    {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
-                                {% else %}
-                                    Processing...
+                                {% if channel.state == channel.COMMITTED %}
+                                    {% if f.is_processed %}
+                                        {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
+                                    {% else %}
+                                        Processing...
+                                    {% endif %}
                                 {% endif %}
                             </td>
 
@@ -98,10 +100,12 @@
 
                 </table>
 
-                <form action="/channel/{{ channel.id }}/upload/" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% include "bootstrap_form.html" %}
-                </form>
+                {% if channel.state == channel.COMMITTED %}
+                    <form action="/channel/{{ channel.id }}/upload/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include "bootstrap_form.html" %}
+                    </form>
+                {% endif %}
             {% else %}
                 <span class="text-muted">Commit settings before uploading.</span>
             {% endif %}

@@ -27,7 +27,6 @@ def index(request):
 
 @login_required
 def session_start(request, session_id):
-    # TODO: add error messages.
     session = Session.objects.get(pk=session_id)
 
     ready = True
@@ -37,7 +36,7 @@ def session_start(request, session_id):
     for c in channels:
         files = File.objects.filter(channel=c)
 
-        ready = c.state == Channel.INITIALIZED and bool(len(files)) and ready
+        ready = c.state == Channel.COMMITTED and bool(len(files)) and ready
 
         for f in files:
             ready = f.is_processed and ready
@@ -146,12 +145,12 @@ def channel_detail(request, channel_id):
         files = File.objects.filter(channel=channel)
         form = UploadFileForm()
 
-    return render(request, 'channel_detail.html', 
-            {'channel': channel,
-             'files': files,
-             'form': form,
-             'parts': parts,
-             'error': utils.get_error(request)})
+    return render(request, 'channel_detail.html',
+                  {'channel': channel,
+                   'files': files,
+                   'form': form,
+                   'parts': parts,
+                   'error': utils.get_error(request)})
 
 
 @login_required

@@ -108,6 +108,9 @@ class Channel(models.Model):
         return self.color
 
     def start(self):
+        self.state = self.STARTING
+        self.save()
+
         request = {}
 
         socket = HttpSocket(self.socket)
