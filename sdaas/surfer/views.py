@@ -387,7 +387,12 @@ def join_session(request):
         if data is not None and time is not None:
             try:
                 c = Client.objects.get(id=data['client_id'])
-                s = Session.objects.get(id=data['session_id'])
+                s = Session.objects.filter(join_code=data['session_id'])
+
+                if len(s) != 1:
+                    return HttpResponse(json.dumps(response_data),
+                                        content_type='application/json')
+                s = s[0]
 
                 if not JoinedClient.objects.filter(client=c, session=s):
                     joined_client = JoinedClient(client=c, session=s)
