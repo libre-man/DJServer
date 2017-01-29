@@ -59,7 +59,7 @@ def session_detail(request, session_id):
     if session is not None:
         channels = Channel.objects.filter(session=session)
 
-    return render(request, 'session_detail.html', {'session': session, 'channels': channels, 'error': utils.get_error(request)})
+    return render(request, 'session_detail.html', {'session': session, 'channels': channels})
 
 
 @login_required
@@ -149,8 +149,7 @@ def channel_detail(request, channel_id):
                   {'channel': channel,
                    'files': files,
                    'form': form,
-                   'parts': parts,
-                   'error': utils.get_error(request)})
+                   'parts': parts})
 
 
 @login_required
