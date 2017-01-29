@@ -43,11 +43,12 @@ def session_start(request, session_id):
             ready = f.is_processed and ready
 
     if ready:
-        session.is_starting = True
         session.save()
 
         for c in channels:
             c.start()
+    else:
+        request.session['error'] = 'Not all channels are ready!'
 
     return HttpResponseRedirect('/session/{}/'.format(session_id))
 
@@ -59,7 +60,7 @@ def session_detail(request, session_id):
     if session is not None:
         channels = Channel.objects.filter(session=session)
 
-    return render(request, 'session_detail.html', {'session': session, 'channels': channels})
+    return render(request, 'session_detail.html', {'session': session, 'channels': channels, 'error': utils.get_error(request)})
 
 
 @login_required
@@ -145,12 +146,12 @@ def channel_detail(request, channel_id):
         files = File.objects.filter(channel=channel)
         form = UploadFileForm()
 
-    error = ''
-    if 'error' in request.session:
-        error = request.session['error']
-        request.session['error'] = ''
-
-    return render(request, 'channel_detail.html', {'channel': channel, 'files': files, 'form': form, 'parts': parts, 'error': error})
+    return render(request, 'channel_detail.html', 
+            {'channel': channel,
+             'files': files,
+             'form': form,
+             'parts': parts,
+             'error': utils.get_error(request)})
 
 
 @login_required

@@ -115,3 +115,10 @@ def parse_json(request):
 
 def datetime_to_epoch(value):
     return int(time.mktime(value.timetuple()) * 1000)
+
+def get_error(request):
+    error = ''
+    if 'error' in request.session:
+        error = request.session['error']
+        request.session['error'] = ''
+    return error

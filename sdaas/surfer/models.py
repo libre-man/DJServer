@@ -24,12 +24,14 @@ class Session(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
 
-    # TODO: figure this out by looping over all channels
-    is_starting = models.BooleanField(default=False)
-    has_started = models.BooleanField(default=False)
-
     def __str__(self):
         return self.name
+
+    def is_starting(self):
+        return len(Channel.objects.filter(session=self, state=Channel.STARTING)) >= 1
+
+    def has_started(self):
+        return len(Channel.objects.filter(session=self, state=Channel.STARTED)) == len(Channel.objects.filter(session=self))
 
 
 class ChannelManager(models.Manager):

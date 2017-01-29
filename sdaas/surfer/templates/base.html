@@ -41,6 +41,18 @@
 
     <div class="container">
         <section class="container-fluid">
+            {% if error %}
+                <div class="row">
+                    <div class="col-md-12" style="margin-top: 20px;">
+                        <div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            {{ error }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             {% block content %}{% endblock %}
         </section>
     </div>
