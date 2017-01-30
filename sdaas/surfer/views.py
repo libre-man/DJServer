@@ -368,6 +368,66 @@ def new_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+@csrf_exempt
+def change_client(request):
+    response_data = {}
+    response_data['success'] = False
+
+    if request.method == 'POST':
+        data, time = utils.parse_client_json(
+            request.body, {('client_id', int), ('birth_year', int), ('birth_month', int), ('birth_day', int), ('gender', str)})
+
+        if data is not None and time is not None:
+            client = Client.objects.get(pk=data['client_id'])
+            if client is not None:
+                client.birth_date = datetime.date(data['birth_year'],
+                                                  data['birth_month'],
+                                                  data['birth_day'])
+                client.gender = data['gender']
+                client.save()
+
+                response_data['success'] = True
+
+    return HttpResponse(json.dumps(response_data),
+                        content_type='application/json')
+
+@csrf_exempt
+def delete_client(request):
+    response_data = {}
+    response_data['success'] = False
+
+    if request.method == 'POST':
+        data, time = utils.parse_client_json(
+            request.body, {('client_id', int)})
+
+        if data is not None and time is not None:
+            client = Client.objects.get(pk=data['client_id'])
+
+            if client is not None:
+                client.delete()
+
+                response_data['success'] = True
+
+    return HttpResponse(json.dumps(response_data),
+                        content_type='application/json')
+
+@csrf_exempt
+def check_client(request):
+    response_data = {}
+    response_data['success'] = False
+
+    if request.method == 'POST':
+        data, time = utils.parse_client_json(
+            request.body, {('client_id', int)})
+
+        if data is not None and time is not None:
+            client = Client.objects.get(pk=data['client_id'])
+
+            if client is not None:
+                response_data['success'] = True
+
+    return HttpResponse(json.dumps(response_data),
+                        content_type='application/json')
 
 @csrf_exempt
 def join_session(request):

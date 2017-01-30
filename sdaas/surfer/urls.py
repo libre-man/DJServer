@@ -43,6 +43,8 @@ urlpatterns = [
     # API urls:
     url(r'^log_data/', views.log_data, name='log_data'),
     url(r'^new_client/', views.new_client, name='new_client'),
+    url(r'^change_client/', views.change_client, name='change_client'),
+    url(r'^delete_client/', views.delete_client, name='delete_client'),
     url(r'^join_session/', views.join_session, name='join_session'),
 
     # Controller->Server API urls:
@@ -53,4 +55,7 @@ urlpatterns = [
     url(r'^get_feedback/', views.get_feedback, name='get_feedback'),
     url(r'^controller_started/', views.controller_started,
         name='controller_started'),
+
+    url(r'^check_client/', views.check_client, name='check_client'),
+
 ]
