@@ -106,3 +106,4 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/accounts/login/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
+OUTPUT_DIR = os.path.join(BASE_DIR, 'output/')

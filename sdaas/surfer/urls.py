@@ -13,6 +13,10 @@ urlpatterns = [
         views.session_edit, name='session_edit'),
     url(r'^session/(?P<session_id>[0-9]+)/delete/$',
         views.session_delete, name='session_delete'),
+    url(r'^session/(?P<session_id>[0-9]+)/settings/$',
+        views.session_settings, name='session_settings'),
+    url(r'^session/(?P<session_id>[0-9]+)/start/$',
+        views.session_start, name='session_start'),
 
     # Channel:
     url(r'^session/(?P<session_id>[0-9]+)/channel/add/$',
@@ -25,6 +29,12 @@ urlpatterns = [
         views.channel_delete, name='channel_delete'),
     url(r'^channel/(?P<channel_id>[0-9]+)/upload/$',
         views.channel_upload, name='channel_upload'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/settings/$',
+        views.channel_settings, name='channel_settings'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/settings/(?P<category_id>[0-9]+)/$',
+        views.channel_part_options, name='channel_part_options'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/commit/$',
+        views.channel_commit_settings, name='channel_commit_settings'),
 
     # Files:
     url(r'^file/(?P<file_id>[0-9]+)/delete/$',
@@ -36,5 +46,16 @@ urlpatterns = [
     url(r'^change_client/', views.change_client, name='change_client'),
     url(r'^delete_client/', views.delete_client, name='delete_client'),
     url(r'^join_session/', views.join_session, name='join_session'),
+
+    # Controller->Server API urls:
+    url(r'^im_alive/', views.im_alive, name='im_alive'),
+    url(r'^iteration/', views.iteration, name='iteration'),
+    url(r'^music_processed/', views.music_processed, name='music_processed'),
+    url(r'^music_deleted/', views.music_deleted, name='music_deleted'),
+    url(r'^get_feedback/', views.get_feedback, name='get_feedback'),
+    url(r'^controller_started/', views.controller_started,
+        name='controller_started'),
+
     url(r'^check_client/', views.check_client, name='check_client'),
+
 ]

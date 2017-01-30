@@ -11,3 +11,10 @@ def addstr(arg1, arg2):
 @register.filter(name="addcss")
 def addcss(field, css):
     return field.as_widget(attrs={"class": css})
+
+
+@register.assignment_tag
+def geterror(request):
+    error = request.session['error']
+    request.session['error'] = ''
+    return error

@@ -3,6 +3,11 @@
 {% load bootstrap3 %}
 {% load surfer_extras %}
 
+
+{% block menubar %}
+    <li role="presentation"><a href="/session/{{ channel.session.id }}/">Session details</a></li>
+{% endblock %}
+
 {% block content %}
 
 {% if channel %}
@@ -16,34 +21,94 @@
                 <dt>Color</dt>
                 <dd><div class="color-bar" style="background-color:{{ channel.color_str }}"></div></dd>
             </dl>
+
+            <h3>Settings</h3>
+
+            <table class="table">
+            {% for cat_id, cat, part, options in parts %}
+                <thead> 
+                    <tr style="background-color:#f5f5f5">
+                        <th>{{ cat }}</th>
+                        <th>{{ part }}</th>
+                        <th style="text-align:right">
+                            {% if part != "Not set" and options|length > 0 and channel.state == channel.INITIALIZED %}
+                                {% bootstrap_button "Edit options" href="/channel/"|addstr:channel.id|addstr:"/settings/"|addstr:cat_id|addstr:"/" %}
+                            {% endif %}
+                        </th>
+                    </tr>
+                </thead> 
+
+                <tbody>
+                    {% if options|length > 0 %}
+                        {% for option in options %}
+                            <tr>
+                                <td><a href="#" data-toggle="tooltip" title="{{ option.documentation }}">{{ option.name }}</a></td>
+                                <td colspan="2">
+                                    {% if option.value == "" %}
+                                        <span class="text-muted">Not set</span>
+                                        {% if option.required %}
+                                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                        {% endif %}
+                                    {% else %}
+                                        {{ option.value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3">
+                                <span class="text-muted">No options available</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            {% endfor %}
+            </table>
+
+
+            {% if channel.state == channel.INITIALIZED %}
+                {% bootstrap_button "Edit part settings" href="/channel/"|addstr:channel.id|addstr:"/settings/" %}
+                {% bootstrap_button "Commit settings" href="/channel/"|addstr:channel.id|addstr:"/commit/" button_class="btn-primary" %}
+            {% endif %}
         </div>
 
         <div class="col-md-6">
             <h3>Music</h3>
-            <table class="table">
-                <tr>
-                    <th>File</th>
-                    <th>Actions</th>
-                </tr>
-
-
-                {% for f in files %}
+            {% if channel.state >= channel.COMMITTED %}
+                <table class="table">
                     <tr>
-                        <td>{{ f.filename }}</td>
-                        <td>
-                            {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
-                        </td>
-
+                        <th>File</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
 
-            </table>
+                    {% for f in files %}
+                        <tr>
+                            <td>{{ f.filename }}</td>
+                            <td>
+                                {% if channel.state == channel.COMMITTED %}
+                                    {% if f.is_processed %}
+                                        {% bootstrap_button "Delete" href="/file/"|addstr:f.id|addstr:"/delete/" button_class="btn-danger" %}
+                                    {% else %}
+                                        Processing...
+                                    {% endif %}
+                                {% endif %}
+                            </td>
 
-            <form action="/channel/{{ channel.id }}/upload/" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form }}
-                <input type="submit" value="submit" />
-            </form>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+
+                {% if channel.state == channel.COMMITTED %}
+                    <form action="/channel/{{ channel.id }}/upload/" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include "bootstrap_form.html" %}
+                    </form>
+                {% endif %}
+            {% else %}
+                <span class="text-muted">Commit settings before uploading.</span>
+            {% endif %}
         </div>
     </div>
 {% else %}

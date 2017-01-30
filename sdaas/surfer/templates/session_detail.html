@@ -16,13 +16,25 @@
     <div class="row">
         <div class="col-md-6">
             <dl>
-                <dt>Start</dt>
-                <dd>{{ session.start }}</dd>
-                <dt>End</dt>
-                <dd>{{ session.end }}</dd>
                 <dt>Join code</dt>
                 <dd>{{ session.join_code }}</dd>
+                {% if session.has_started %}
+                    <dt>Started:</dt>
+                    <dd>{{ session.start }}</dd>
+                    <dt>Joined clients:</dt>
+                    <dd>{{ session.joined_clients }}</dd>
+                {% endif %}
             </dl>
+
+            {% if not session.has_started and not session.is_starting %}
+                {% bootstrap_button "Start session" href="/session/"|addstr:session.id|addstr:"/start/" button_class="btn-primary" %}
+            {% endif %}
+
+            {% if session.is_starting %}
+                <span>Session is starting...</span>
+            {% elif session.has_started %}
+                <span>Session has started.</span>
+            {% endif %}
         </div>
 
         <div class="col-md-6">
@@ -42,16 +54,26 @@
                         <td><a href="/channel/{{ c.id }}/">{{ c.url }}</a></td>
                         <td><div class="color-bar" style="background-color:{{ c.color_str }}"></div></td>
                         <td>
-                            {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
-                            {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
-                            {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger"%}
+                            {% if c.state != c.INITIALIZING %}
+                                {% bootstrap_button "View" href="/channel/"|addstr:c.id|addstr:"/" %}
+
+                                {% if c.state == c.INITIALIZED or c.state == c.COMMITTED %}
+                                    {% bootstrap_button "Edit" href="/channel/"|addstr:c.id|addstr:"/edit/" button_class="btn-warning" %}
+                                    {% bootstrap_button "Delete" href="/channel/"|addstr:c.id|addstr:"/delete/" button_class="btn-danger" %}
+                                {% endif %}
+                            {% else %}
+                                Initializing channel...
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
             </table>
 
-            {% bootstrap_button "Add new channel" href="/session/"|addstr:session.id|addstr:"/channel/add/" %}
 
+
+            {% if not session.is_starting and not session.has_started %}
+                {% bootstrap_button "Add new channel" href="/session/"|addstr:session.id|addstr:"/channel/add/" %}
+            {% endif %}
         </div>
     </div>
 

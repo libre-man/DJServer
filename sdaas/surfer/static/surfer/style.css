@@ -2,3 +2,41 @@
     width: 70px;
     height: 20px;
 }
+
+.footer {
+    margin-top: 40px;
+    width: 100%;
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+.text-muted {
+    margin: 20px 0;
+}
+
+header {
+    padding-top: 20px;
+    background-color: #A5E5AF;
+}
+
+.navbar-default {
+    background-color: #a5e5af;
+    padding: 15px 0;
+}
+
+.navbar-brand {
+    padding: 0 15px;
+    height: inherit;
+}
+
+.navbar-nav {
+    margin-top: 5px;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #444;
+}
+
+.part-help {
+    margin-top: 10px;
+}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Change part settings for {{ channel.name }}</h3>
+        <form action="/channel/{{ channel.id }}/settings/" method="post">
+            {% csrf_token %}
+
+            {% include "bootstrap_form.html" %}
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}
