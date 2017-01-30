@@ -103,7 +103,7 @@ class Channel(models.Model):
     objects = ChannelManager()
 
     def __str__(self):
-        return '%d: %s' % (self.id, self.url)
+        return '%d' % (self.id)
 
     def color_str(self):
         return self.color

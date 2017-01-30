@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect
 
 from . import utils
-from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption
+from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption, PlayedFile
 from .forms import SessionForm, UploadFileForm, ChannelForm, PartSelectForm, PartOptionForm
 
 
@@ -143,13 +143,16 @@ def channel_detail(request, channel_id):
             parts.append((c[0], c[1], part, options))
 
         files = File.objects.filter(channel=channel)
+        playedFiles = PlayedFile.objects.filter(
+            file__channel=channel).order_by('time_played')
         form = UploadFileForm()
 
     return render(request, 'channel_detail.html',
                   {'channel': channel,
                    'files': files,
                    'form': form,
-                   'parts': parts})
+                   'parts': parts,
+                   'playedFiles': playedFiles})
 
 
 @login_required
@@ -569,11 +572,12 @@ def iteration(request):
     if request.method == 'POST':
         data = utils.parse_json(request.body)
 
-        if isinstance(data['id'], int) and isinstance(data['file_mixed'], str):
+        if isinstance(data['id'], int) and isinstance(data['filename_mixed'], str):
             channel = Channel.objects.get(pk=data['id'])
-            f = File.objects.filter(channel=channel, upload=data['file_mixed'])
+            f = File.objects.filter(
+                channel=channel, upload='channels/{}/{}.mp3'.format(channel.id, data['filename_mixed']))
             playedFile = PlayedFile(file=f[0])
-            playerFile.save()
+            playedFile.save()
 
     return HttpResponse()
 
