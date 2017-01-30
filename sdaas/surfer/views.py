@@ -552,11 +552,8 @@ def controller_started(request):
             channel.epoch = data['epoch']
             channel.save()
 
-            # TODO: fix.
-            if len(Channel.objects.filter(session=channel.session)) ==\
-               len(Channel.objects.filter(session=channel.session, has_started=True)):
-                channel.session.has_started = True
-                channel.session.save()
+            # TODO: update session to set start_date etc.
+            # TODO: set url or maybe on channel init?.
 
     return HttpResponse()
 

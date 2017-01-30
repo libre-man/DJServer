@@ -16,12 +16,14 @@
     <div class="row">
         <div class="col-md-6">
             <dl>
-                <dt>Start</dt>
-                <dd>{{ session.start }}</dd>
-                <dt>End</dt>
-                <dd>{{ session.end }}</dd>
                 <dt>Join code</dt>
                 <dd>{{ session.join_code }}</dd>
+                {% if session.has_started %}
+                    <dt>Started:</dt>
+                    <dd>{{ session.start }}</dd>
+                    <dt>Joined clients:</dt>
+                    <dd>{{ session.joined_clients }}</dd>
+                {% endif %}
             </dl>
 
             {% if not session.has_started and not session.is_starting %}

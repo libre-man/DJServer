@@ -9,16 +9,8 @@ class SessionForm(ModelForm):
 
     class Meta:
         model = Session
-        fields = ('name', 'start', 'end', 'join_code')
-        widgets = {
-            'start': DateTimeInput(format='%Y-%m-%d %H:%M:%S',
-                                   attrs={'placeholder': '2017-01-13 14:30:59'}),
-            'end': DateTimeInput(format='%Y-%m-%d %H:%M:%S',
-                                 attrs={'placeholder': '2017-01-13 14:30:59'}),
-        }
+        fields = ('name', 'join_code')
         help_texts = {
-            'start': 'The start date and time of the session',
-            'end': 'The end date and time of the session',
             'join_code': 'The code clients need to enter to join this session',
         }
 

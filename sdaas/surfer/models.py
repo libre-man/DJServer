@@ -21,8 +21,7 @@ class Session(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     join_code = models.CharField(max_length=16)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    start = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
@@ -32,6 +31,9 @@ class Session(models.Model):
 
     def has_started(self):
         return len(Channel.objects.filter(session=self, state=Channel.STARTED)) == len(Channel.objects.filter(session=self))
+
+    def joined_clients(self):
+        return len(JoinedClient.objects.filter(session=self))
 
 
 class ChannelManager(models.Manager):
@@ -55,7 +57,7 @@ class ChannelManager(models.Manager):
                        'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
                        'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
                        'PYTHONUNBUFFERED=False',
-                       'SDAAS_REMOTE_URL=http://10.1.10.181:8080',
+                       'SDAAS_REMOTE_URL=http://145.109.39.51:8080',
                        'SDAAS_SOCKET={}'.format(channel.socket)]
 
         volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},
