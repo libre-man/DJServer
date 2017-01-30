@@ -477,10 +477,9 @@ def join_session(request):
                     response_data['channels'].append({'channel_id': c.id,
                                                       'name': c.name,
                                                       'color': c.color,
-                                                      'url': c.url})
+                                                      'url': c.get_url(),
+                                                      'start': c.get_start()})
 
-                response_data[
-                    'session_start'] = utils.datetime_to_epoch(s.start)
             except ObjectDoesNotExist:
                 response_data['error'] = 'Client or session does not exist'
 

@@ -21,7 +21,6 @@ class Session(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     join_code = models.CharField(max_length=16)
-    start = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
@@ -80,7 +79,6 @@ class Channel(models.Model):
     """
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    url = models.URLField(null=True)
     color = models.CharField(max_length=7)
 
     INITIALIZING, INITIALIZED, COMMITTED, STARTING, STARTED = range(5)
@@ -126,6 +124,13 @@ class Channel(models.Model):
     def get_logs(self):
         client = docker.from_env()
         return client.containers.get(self.docker_id).logs()
+
+    def get_start(self):
+        # TODO: fix segment size.
+        return self.epoch + 60
+
+    def get_url(self):
+        return os.join_path(settings.STREAMING_URL, self.id)
 
 
 @receiver(pre_delete, sender=Channel)
