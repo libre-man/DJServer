@@ -318,6 +318,12 @@ def channel_commit_settings(request, channel_id):
 
     return HttpResponseRedirect('/channel/{}/'.format(channel.id))
 
+
+@login_required
+def channel_logs(request, channel_id):
+    channel = Channel.objects.get(pk=channel_id)
+    return render(request, 'channel_logs.html', {'channel': channel})
+
 # Music file upload
 # -----------------------------------------------------------------------------
 
@@ -368,6 +374,7 @@ def new_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def change_client(request):
     response_data = {}
@@ -391,6 +398,7 @@ def change_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def delete_client(request):
     response_data = {}
@@ -411,6 +419,7 @@ def delete_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def check_client(request):
     response_data = {}
@@ -428,6 +437,7 @@ def check_client(request):
 
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
+
 
 @csrf_exempt
 def join_session(request):

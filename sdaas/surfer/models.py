@@ -123,6 +123,10 @@ class Channel(models.Model):
         print("starting channel")
         print(response.read().decode())
 
+    def get_logs(self):
+        client = docker.from_env()
+        return client.containers.get(self.docker_id).logs()
+
 
 @receiver(pre_delete, sender=Channel)
 def channel_delete(sender, instance, **kwargs):

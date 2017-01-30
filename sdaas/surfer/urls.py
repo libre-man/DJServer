@@ -35,6 +35,8 @@ urlpatterns = [
         views.channel_part_options, name='channel_part_options'),
     url(r'^channel/(?P<channel_id>[0-9]+)/commit/$',
         views.channel_commit_settings, name='channel_commit_settings'),
+    url(r'^channel/(?P<channel_id>[0-9]+)/logs/$',
+        views.channel_logs, name='channel_logs'),
 
     # Files:
     url(r'^file/(?P<file_id>[0-9]+)/delete/$',
