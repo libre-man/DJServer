@@ -12,3 +12,5 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+CONTROLLER_URL = 'http://10.1.10.181:8080'

@@ -52,12 +52,13 @@ class ChannelManager(models.Manager):
             settings.OUTPUT_DIR, str(channel.id))
 
         os.makedirs(channel.output_dir)
+        os.makedirs(get_input_dir(channel.id))
 
         environment = ['SDAAS_ID={}'.format(channel.id),
                        'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
                        'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
                        'PYTHONUNBUFFERED=False',
-                       'SDAAS_REMOTE_URL=http://145.109.39.51:8080',
+                       'SDAAS_REMOTE_URL={}'.format(settings.CONTROLLER_URL),
                        'SDAAS_SOCKET={}'.format(channel.socket)]
 
         volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},

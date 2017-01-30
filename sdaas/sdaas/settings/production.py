@@ -27,3 +27,6 @@ DATABASES = {
         },
     }
 }
+
+CONTROLLER_URL = 'http://sdaas.nl'
+OUTPUT_DIR = '/home/yourivoet/public/controller.sdaas.nl/public/'
