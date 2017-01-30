@@ -219,7 +219,6 @@ def file_delete(sender, instance, **kwargs):
 class PlayedFile(models.Model):
     """To log played files by channels, PlayedFile objects are created."""
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     time_played = models.DateTimeField(auto_now_add=True)
 
 

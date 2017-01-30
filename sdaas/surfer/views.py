@@ -566,6 +566,15 @@ def iteration(request):
 
     Expected JSON: { 'id': int, 'file_mixed': string }
     """
+    if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
+        if isinstance(data['id'], int) and isinstance(data['file_mixed'], str):
+            channel = Channel.objects.get(pk=data['id'])
+            f = File.objects.filter(channel=channel, upload=data['file_mixed'])
+            playedFile = PlayedFile(file=f[0])
+            playerFile.save()
+
     return HttpResponse()
 
 
