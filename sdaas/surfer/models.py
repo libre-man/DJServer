@@ -37,7 +37,7 @@ class Session(models.Model):
 
 class ChannelManager(models.Manager):
 
-    def create_channel(self, session, name="Default", color=0):
+    def create_channel(self, session, name='Default', color='#e67e22'):
         channel = self.create(name=name, session=session, color=color)
 
         # Create docker container.
@@ -79,7 +79,7 @@ class Channel(models.Model):
     """
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    color = models.CharField(max_length=7)
+    color = models.CharField(max_length=7, default='#1abc9c')
 
     INITIALIZING, INITIALIZED, COMMITTED, STARTING, STARTED = range(5)
     STATE_CHOICES = {
