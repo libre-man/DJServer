@@ -2,6 +2,7 @@ import os
 import docker
 import json
 import shutil
+import zipfile
 
 from .utils import HttpSocket
 
@@ -10,6 +11,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class Session(models.Model):
@@ -163,7 +165,7 @@ def file_path(instance, filename):
 
 class FileManager(models.Manager):
 
-    def create_file(self, channel, upload):
+    def _create_mp3(self, channel, upload):
         instance = self.create(channel=channel, upload=upload)
 
         request = {'file_location': os.path.join(
@@ -176,6 +178,24 @@ class FileManager(models.Manager):
         print(response.read().decode())
 
         return instance
+
+    def _upload_zip(self, channel, upload):
+        unzipped = zipfile.ZipFile(upload)
+
+        for f in unzipped.namelist():
+            if f.startswith('__MACOSX/') or not f.endswith('.mp3'):
+                continue
+
+            self._create_mp3(channel, SimpleUploadedFile(
+                f, unzipped.read(f), 'mp3'))
+
+    def create_file(self, channel, upload):
+        if upload.name.endswith('.mp3'):
+            return self._create_mp3(channel, upload)
+        elif upload.name.endswith('.zip'):
+            self._upload_zip(channel, upload)
+
+        return None
 
 
 class File(models.Model):
@@ -210,7 +230,7 @@ def file_delete(sender, instance, **kwargs):
                                headers={'Content-type': 'application/json'})
                 response = socket.getresponse()
                 print(response.read().decode())
-            except FileNotFoundError:
+            except (FileNotFoundError, ConnectionRefusedError) as e:
                 pass
 
             os.remove(instance.upload.path)

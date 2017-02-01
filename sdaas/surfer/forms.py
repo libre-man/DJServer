@@ -27,7 +27,8 @@ class ChannelForm(ModelForm):
 
 
 class UploadFileForm(forms.Form):
-    upload = forms.FileField()
+    upload = forms.FileField(
+        help_text='Please upload MP3 files or zip archives containing MP3 files.')
 
 
 class PartSelectForm(forms.Form):
