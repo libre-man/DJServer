@@ -42,3 +42,5 @@ echo "Done"
 
 deactivate
 
+# Change owner to www-data
+chown -R www-data:www-data $deploy_dir
