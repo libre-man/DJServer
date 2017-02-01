@@ -18,7 +18,7 @@
                 <a href="/channel/{{ channel.id }}/edit/">{% bootstrap_icon "pencil" %}</a></h3>
             <dl>
                 <dt>URL</dt>
-                <dd>{{ channel.url }}</dd>
+                <dd>{{ channel.get_url }}</dd>
                 <dt>Color</dt>
                 <dd><div class="color-bar" style="background-color:{{ channel.color_str }}"></div></dd>
             </dl>

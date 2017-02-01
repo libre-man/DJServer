@@ -130,7 +130,7 @@ class Channel(models.Model):
         return self.epoch + 60
 
     def get_url(self):
-        return os.join_path(settings.STREAMING_URL, self.id)
+        return os.path.join(settings.STREAMING_URL, str(self.id))
 
 
 @receiver(pre_delete, sender=Channel)
