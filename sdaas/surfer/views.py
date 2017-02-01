@@ -617,11 +617,15 @@ def get_feedback(request):
     timeframe.
     """
     if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
         if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
             channel = Channel.objects.get(pk=data['id'])
 
-            start = datetime.datetime.utcfromtimestamp(data['start'])
-            end = datetime.datetime.utcfromtimestamp(data['end'])
+            start = datetime.datetime.utcfromtimestamp(
+                channel.epoch + data['start'])
+            end = datetime.datetime.utcfromtimestamp(
+                channel.epoch + data['end'])
 
             feedback = Data.objects.filter(
                 channel=channel, server_time__range=(start, end))
@@ -630,6 +634,7 @@ def get_feedback(request):
             response = {}
             response['feedback'] = {}
 
+    print(json.dumps(response))
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 
