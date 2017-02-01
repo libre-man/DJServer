@@ -455,7 +455,7 @@ def join_session(request):
     if request.method == 'POST':
         data, time = utils.parse_client_json(request.body,
                                              {('client_id', int),
-                                              ('session_id', int)})
+                                              ('session_id', str)})
 
         if data is not None and time is not None:
             try:
