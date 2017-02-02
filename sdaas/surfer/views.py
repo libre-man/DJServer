@@ -501,10 +501,14 @@ def log_data(request):
     response_data['success'] = False
 
     if request.method == 'POST':
-        data, time = utils.parse_client_json(request.body)
+        data, time = utils.parse_client_json(
+            request.body, {('channel_id', int), ('client_id', int)})
 
         if data is not None and time is not None:
-            # TODO: log the actual data...
+            client = Client.objects.get(pk=data['client_id'])
+            channel = Channel.objects.get(pk=data['channel_id'])
+            d = Data(client=client, channel=channel, client_time=datetime.datetime.fromtimestramp(time))
+            d.save()
 
             response_data['success'] = True
 
