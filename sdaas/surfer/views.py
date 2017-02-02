@@ -616,23 +616,23 @@ def get_feedback(request):
     """API call from a channel controller to get feedback in a certain
     timeframe.
     """
-    if request.method == 'POST':
-        data = utils.parse_json(request.body)
+    # if request.method == 'POST':
+    #    data = utils.parse_json(request.body)
 
-        if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
-            channel = Channel.objects.get(pk=data['id'])
+    #    if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
+    #        channel = Channel.objects.get(pk=data['id'])
 
-            start = datetime.datetime.utcfromtimestamp(
-                channel.epoch + data['start'])
-            end = datetime.datetime.utcfromtimestamp(
-                channel.epoch + data['end'])
+    #        start = datetime.datetime.utcfromtimestamp(
+    #            channel.epoch + data['start'])
+    #        end = datetime.datetime.utcfromtimestamp(
+    #            channel.epoch + data['end'])
 
-            feedback = Data.objects.filter(
-                channel=channel, server_time__range=(start, end))
+    #        feedback = Data.objects.filter(
+    #            channel=channel, server_time__range=(start, end))
 
-            # TODO: further implement.
-            response = {}
-            response['feedback'] = {}
+    # TODO: further implement.
+    response = {}
+    response['feedback'] = {}
 
     print(json.dumps(response))
     return HttpResponse(json.dumps(response), content_type='application/json')
