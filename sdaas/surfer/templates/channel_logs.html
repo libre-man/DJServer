@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load bootstrap3 %}
+{% load surfer_extras %}
+
+
+{% block menubar %}
+    <li role="presentation"><a href="/session/{{ channel.session.id }}/">Session details</a></li>
+    <li role="presentation"><a href="/channel/{{ channel.id }}/">Channel details</a></li>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Logs of {{ channel.name }}</h3>
+
+        <pre>
+            {{ channel.get_logs }}
+        </pre>
+    </div>
+</div>
+
+
+{% endblock %}

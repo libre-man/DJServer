@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, redirect
 
 from . import utils
-from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption
+from .models import Client, Session, JoinedClient, Channel, File, ControllerPart, ControllerPartOption, PlayedFile, Data
 from .forms import SessionForm, UploadFileForm, ChannelForm, PartSelectForm, PartOptionForm
 
 
@@ -143,13 +143,16 @@ def channel_detail(request, channel_id):
             parts.append((c[0], c[1], part, options))
 
         files = File.objects.filter(channel=channel)
+        playedFiles = PlayedFile.objects.filter(
+            file__channel=channel).order_by('time_played')
         form = UploadFileForm()
 
     return render(request, 'channel_detail.html',
                   {'channel': channel,
                    'files': files,
                    'form': form,
-                   'parts': parts})
+                   'parts': parts,
+                   'playedFiles': playedFiles})
 
 
 @login_required
@@ -318,6 +321,12 @@ def channel_commit_settings(request, channel_id):
 
     return HttpResponseRedirect('/channel/{}/'.format(channel.id))
 
+
+@login_required
+def channel_logs(request, channel_id):
+    channel = Channel.objects.get(pk=channel_id)
+    return render(request, 'channel_logs.html', {'channel': channel})
+
 # Music file upload
 # -----------------------------------------------------------------------------
 
@@ -368,6 +377,7 @@ def new_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def change_client(request):
     response_data = {}
@@ -391,6 +401,7 @@ def change_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def delete_client(request):
     response_data = {}
@@ -411,6 +422,7 @@ def delete_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def check_client(request):
     response_data = {}
@@ -429,6 +441,7 @@ def check_client(request):
     return HttpResponse(json.dumps(response_data),
                         content_type='application/json')
 
+
 @csrf_exempt
 def join_session(request):
     """Lets a client Android application join a session.
@@ -442,7 +455,7 @@ def join_session(request):
     if request.method == 'POST':
         data, time = utils.parse_client_json(request.body,
                                              {('client_id', int),
-                                              ('session_id', int)})
+                                              ('session_id', str)})
 
         if data is not None and time is not None:
             try:
@@ -467,10 +480,9 @@ def join_session(request):
                     response_data['channels'].append({'channel_id': c.id,
                                                       'name': c.name,
                                                       'color': c.color,
-                                                      'url': c.url})
+                                                      'url': c.get_url(),
+                                                      'start': c.get_start()})
 
-                response_data[
-                    'session_start'] = utils.datetime_to_epoch(s.start)
             except ObjectDoesNotExist:
                 response_data['error'] = 'Client or session does not exist'
 
@@ -489,9 +501,15 @@ def log_data(request):
     response_data['success'] = False
 
     if request.method == 'POST':
-        data, time = utils.parse_client_json(request.body)
+        data, time = utils.parse_client_json(
+            request.body, {('channel_id', int), ('client_id', int)})
 
         if data is not None and time is not None:
+            client = Client.objects.get(pk=data['client_id'])
+            channel = Channel.objects.get(pk=data['channel_id'])
+            d = Data(client=client, channel=channel, client_time=datetime.datetime.fromtimestramp(time))
+            d.save()
+
             response_data['success'] = True
 
     return HttpResponse(json.dumps(response_data),
@@ -557,6 +575,16 @@ def iteration(request):
 
     Expected JSON: { 'id': int, 'file_mixed': string }
     """
+    if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
+        if isinstance(data['id'], int) and isinstance(data['filename_mixed'], str):
+            channel = Channel.objects.get(pk=data['id'])
+            f = File.objects.filter(
+                channel=channel, upload='channels/{}/{}.mp3'.format(channel.id, data['filename_mixed']))
+            playedFile = PlayedFile(file=f[0])
+            playedFile.save()
+
     return HttpResponse()
 
 
@@ -592,7 +620,26 @@ def get_feedback(request):
     """API call from a channel controller to get feedback in a certain
     timeframe.
     """
-    return HttpResponse()
+    # if request.method == 'POST':
+    #    data = utils.parse_json(request.body)
+
+    #    if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
+    #        channel = Channel.objects.get(pk=data['id'])
+
+    #        start = datetime.datetime.utcfromtimestamp(
+    #            channel.epoch + data['start'])
+    #        end = datetime.datetime.utcfromtimestamp(
+    #            channel.epoch + data['end'])
+
+    #        feedback = Data.objects.filter(
+    #            channel=channel, server_time__range=(start, end))
+
+    # TODO: further implement.
+    response = {}
+    response['feedback'] = {}
+
+    print(json.dumps(response))
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 
 @csrf_exempt

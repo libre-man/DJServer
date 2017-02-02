@@ -107,3 +107,4 @@ LOGIN_URL = '/accounts/login/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads/')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output/')
+STREAMING_URL = 'http://your_url_here'

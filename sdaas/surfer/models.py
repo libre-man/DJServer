@@ -2,6 +2,7 @@ import os
 import docker
 import json
 import shutil
+import zipfile
 
 from .utils import HttpSocket
 
@@ -10,6 +11,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 class Session(models.Model):
@@ -21,7 +23,6 @@ class Session(models.Model):
     host = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     join_code = models.CharField(max_length=16)
-    start = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
@@ -38,7 +39,7 @@ class Session(models.Model):
 
 class ChannelManager(models.Manager):
 
-    def create_channel(self, session, name="Default", color=0):
+    def create_channel(self, session, name='Default', color='#e67e22'):
         channel = self.create(name=name, session=session, color=color)
 
         # Create docker container.
@@ -52,12 +53,13 @@ class ChannelManager(models.Manager):
             settings.OUTPUT_DIR, str(channel.id))
 
         os.makedirs(channel.output_dir)
+        os.makedirs(get_input_dir(channel.id))
 
         environment = ['SDAAS_ID={}'.format(channel.id),
                        'SDAAS_INPUT_DIR={}'.format(channel.input_dir),
                        'SDAAS_OUTPUT_DIR=/home/dj_feet/output',
                        'PYTHONUNBUFFERED=False',
-                       'SDAAS_REMOTE_URL=http://145.109.39.51:8080',
+                       'SDAAS_REMOTE_URL={}'.format(settings.CONTROLLER_URL),
                        'SDAAS_SOCKET={}'.format(channel.socket)]
 
         volumes = {socket_dir: {'bind': socket_dir, 'mode': 'rw'},
@@ -79,8 +81,7 @@ class Channel(models.Model):
     """
     name = models.CharField(max_length=50)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
-    url = models.URLField(null=True)
-    color = models.CharField(max_length=7)
+    color = models.CharField(max_length=7, default='#1abc9c')
 
     INITIALIZING, INITIALIZED, COMMITTED, STARTING, STARTED = range(5)
     STATE_CHOICES = {
@@ -104,7 +105,7 @@ class Channel(models.Model):
     objects = ChannelManager()
 
     def __str__(self):
-        return '%d: %s' % (self.id, self.url)
+        return '%d' % (self.id)
 
     def color_str(self):
         return self.color
@@ -121,6 +122,17 @@ class Channel(models.Model):
         response = socket.getresponse()
         print("starting channel")
         print(response.read().decode())
+
+    def get_logs(self):
+        client = docker.from_env()
+        return client.containers.get(self.docker_id).logs()
+
+    def get_start(self):
+        # TODO: fix segment size.
+        return self.epoch + 60
+
+    def get_url(self):
+        return os.path.join(settings.STREAMING_URL, str(self.id))
 
 
 @receiver(pre_delete, sender=Channel)
@@ -153,7 +165,7 @@ def file_path(instance, filename):
 
 class FileManager(models.Manager):
 
-    def create_file(self, channel, upload):
+    def _create_mp3(self, channel, upload):
         instance = self.create(channel=channel, upload=upload)
 
         request = {'file_location': os.path.join(
@@ -166,6 +178,24 @@ class FileManager(models.Manager):
         print(response.read().decode())
 
         return instance
+
+    def _upload_zip(self, channel, upload):
+        unzipped = zipfile.ZipFile(upload)
+
+        for f in unzipped.namelist():
+            if f.startswith('__MACOSX/') or not f.endswith('.mp3'):
+                continue
+
+            self._create_mp3(channel, SimpleUploadedFile(
+                f, unzipped.read(f), 'mp3'))
+
+    def create_file(self, channel, upload):
+        if upload.name.endswith('.mp3'):
+            return self._create_mp3(channel, upload)
+        elif upload.name.endswith('.zip'):
+            self._upload_zip(channel, upload)
+
+        return None
 
 
 class File(models.Model):
@@ -200,7 +230,7 @@ def file_delete(sender, instance, **kwargs):
                                headers={'Content-type': 'application/json'})
                 response = socket.getresponse()
                 print(response.read().decode())
-            except FileNotFoundError:
+            except (FileNotFoundError, ConnectionRefusedError) as e:
                 pass
 
             os.remove(instance.upload.path)
@@ -209,7 +239,6 @@ def file_delete(sender, instance, **kwargs):
 class PlayedFile(models.Model):
     """To log played files by channels, PlayedFile objects are created."""
     file = models.ForeignKey(File, on_delete=models.CASCADE)
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     time_played = models.DateTimeField(auto_now_add=True)
 
 

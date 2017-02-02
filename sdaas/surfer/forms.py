@@ -27,7 +27,8 @@ class ChannelForm(ModelForm):
 
 
 class UploadFileForm(forms.Form):
-    upload = forms.FileField()
+    upload = forms.FileField(
+        help_text='Please upload MP3 files or zip archives containing MP3 files.')
 
 
 class PartSelectForm(forms.Form):
@@ -45,7 +46,7 @@ class PartSelectForm(forms.Form):
             self.fields[cat_name].help_text = ''
             for p in parts:
                 self.fields[
-                    cat_name].help_text += '<div class="part-help">{}<br/>{}</div>'.format(p.name, p.long_doc)
+                    cat_name].help_text += '<div class="part-help"><strong>{}</strong><br/>{}</div>'.format(p.name, p.long_doc)
 
 
 class PartOptionForm(forms.Form):
