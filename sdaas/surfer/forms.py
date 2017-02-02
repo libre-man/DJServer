@@ -46,7 +46,7 @@ class PartSelectForm(forms.Form):
             self.fields[cat_name].help_text = ''
             for p in parts:
                 self.fields[
-                    cat_name].help_text += '<div class="part-help"><strong>{}</strong><br/>{}</div>'.format(p.name, p.long_doc)
+                    cat_name].help_text += '<div class="part-help"><strong>{}</strong><br/>{}<br/><br/>{}</div>'.format(p.name, p.short_doc, p.long_doc)
 
 
 class PartOptionForm(forms.Form):
