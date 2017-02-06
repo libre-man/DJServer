@@ -1,5 +1,6 @@
 import json
 import datetime
+from numbers import Number
 
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -620,23 +621,47 @@ def get_feedback(request):
     """API call from a channel controller to get feedback in a certain
     timeframe.
     """
-    # if request.method == 'POST':
-    #    data = utils.parse_json(request.body)
-
-    #    if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
-    #        channel = Channel.objects.get(pk=data['id'])
-
-    #        start = datetime.datetime.utcfromtimestamp(
-    #            channel.epoch + data['start'])
-    #        end = datetime.datetime.utcfromtimestamp(
-    #            channel.epoch + data['end'])
-
-    #        feedback = Data.objects.filter(
-    #            channel=channel, server_time__range=(start, end))
-
-    # TODO: further implement.
     response = {}
     response['feedback'] = {}
+    if request.method == 'POST':
+        data = utils.parse_json(request.body)
+
+        if isinstance(data['start'], Number) and isinstance(data['end'], Number) and isinstance(data['id'], int):
+            seen_users = set()
+            users_stayed = set()
+            users_left = {}
+            channel = Channel.objects.get(pk=data['id'])
+
+            start = datetime.datetime.utcfromtimestamp(
+                channel.epoch + int(data['start']))
+            end = datetime.datetime.utcfromtimestamp(
+                channel.epoch + int(data['end']))
+
+            feedback = Data.objects.filter(
+                channel=channel, server_time__range=(start, end))
+
+            for point in feedback:
+                if point.channel == channel:
+                    if point.user.id in users_left: # user returned
+                        del users_left[point.user.id]
+                        users_stayed.add(point.user.id)
+
+                    # First time we see the user, assume it stays
+                    # Newly joining users are also seen as positive
+                    users_stayed.add(point.user.id)
+
+                elif point.user.id in users_stayed: # user left
+                    users_stayed.remove(point.user.id)
+                    users_left[point.user.id] = point.client_time.timestamp()
+                else: # user was on another channel and never was on our
+                    pass
+
+                seen_users.add(point.client.id)
+            response['feedback'] = users_left
+            for stayed in users_stayed:
+                response['feedback'][stayed] = None
+
+
 
     print(json.dumps(response))
     return HttpResponse(json.dumps(response), content_type='application/json')
