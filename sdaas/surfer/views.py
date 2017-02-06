@@ -508,7 +508,7 @@ def log_data(request):
         if data is not None and time is not None:
             client = Client.objects.get(pk=data['client_id'])
             channel = Channel.objects.get(pk=data['channel_id'])
-            d = Data(client=client, channel=channel, client_time=datetime.datetime.fromtimestramp(time))
+            d = Data(client=client, channel=channel, client_time=time)
             d.save()
 
             response_data['success'] = True
