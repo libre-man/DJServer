@@ -627,36 +627,37 @@ def get_feedback(request):
         data = utils.parse_json(request.body)
 
         if isinstance(data['start'], Number) and isinstance(data['end'], Number) and isinstance(data['id'], int):
-            seen_users = set()
-            users_stayed = set()
-            users_left = {}
+            seen_clients = set()
+            clients_stayed = set()
+            clients_left = {}
             channel = Channel.objects.get(pk=data['id'])
 
-            start = int(data['start'])
-            end = int(data['end'])
+            start = datetime.datetime.utcfromtimestamp(
+                channel.epoch + int(data['start']))
+            end = datetime.datetime.utcfromtimestamp(
+                channel.epoch + int(data['end']))
 
-            feedback = Data.objects.filter(
-                channel=channel, server_time__range=(start, end))
+            feedback = Data.objects.filter(server_time__gte=start, server_time__lte=end)
 
             for point in feedback:
                 if point.channel == channel:
-                    if point.user.id in users_left: # user returned
-                        del users_left[point.user.id]
-                        users_stayed.add(point.user.id)
+                    if point.client.id in clients_left: # client returned
+                        del clients_left[point.client.id]
+                        clients_stayed.add(point.client.id)
 
-                    # First time we see the user, assume it stays
-                    # Newly joining users are also seen as positive
-                    users_stayed.add(point.user.id)
+                    # First time we see the client, assume it stays
+                    # Newly joining clients are also seen as positive
+                    clients_stayed.add(point.client.id)
 
-                elif point.user.id in users_stayed: # user left
-                    users_stayed.remove(point.user.id)
-                    users_left[point.user.id] = point.client_time.timestamp()
-                else: # user was on another channel and never was on our
+                elif point.client.id in clients_stayed: # client left
+                    clients_stayed.remove(point.client.id)
+                    clients_left[point.client.id] = point.client_time.timestamp()
+                else: # client was on another channel and never was on our
                     pass
 
-                seen_users.add(point.client.id)
-            response['feedback'] = users_left
-            for stayed in users_stayed:
+                seen_clients.add(point.client.id)
+            response['feedback'] = clients_left
+            for stayed in clients_stayed:
                 response['feedback'][stayed] = None
 
 
