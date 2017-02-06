@@ -632,10 +632,8 @@ def get_feedback(request):
             users_left = {}
             channel = Channel.objects.get(pk=data['id'])
 
-            start = datetime.datetime.utcfromtimestamp(
-                channel.epoch + int(data['start']))
-            end = datetime.datetime.utcfromtimestamp(
-                channel.epoch + int(data['end']))
+            start = int(data['start'])
+            end = int(data['end'])
 
             feedback = Data.objects.filter(
                 channel=channel, server_time__range=(start, end))
