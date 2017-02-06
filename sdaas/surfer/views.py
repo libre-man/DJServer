@@ -1,5 +1,6 @@
 import json
 import datetime
+from numbers import Number
 
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -625,16 +626,16 @@ def get_feedback(request):
     if request.method == 'POST':
         data = utils.parse_json(request.body)
 
-        if isinstance(data['start'], int) and isinstance(data['end'], int) and isinstance(data['id'], int):
+        if isinstance(data['start'], Number) and isinstance(data['end'], Number) and isinstance(data['id'], int):
             seen_users = set()
             users_stayed = set()
             users_left = {}
             channel = Channel.objects.get(pk=data['id'])
 
             start = datetime.datetime.utcfromtimestamp(
-                channel.epoch + data['start'])
+                channel.epoch + int(data['start']))
             end = datetime.datetime.utcfromtimestamp(
-                channel.epoch + data['end'])
+                channel.epoch + int(data['end']))
 
             feedback = Data.objects.filter(
                 channel=channel, server_time__range=(start, end))
